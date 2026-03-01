@@ -367,7 +367,7 @@ everything-app/
 
 ---
 
-### 1.11 — Widget Catalog
+### 1.11 — Widget Catalog — COMPLETE (2026-03-02)
 
 **Goal:** Build the slide-in panel that shows all available widgets and allows adding them to the current dashboard.
 
@@ -383,18 +383,22 @@ everything-app/
    - Adds the widget to the current layout in the Zustand store.
    - The widget immediately appears in the grid.
    - Closes the catalog (or keeps it open — user preference).
-3. Add a "Remove" option to the widget card's dropdown menu (right-click or triple-dot menu):
+3. Add a "Remove" option to the widget card header:
+   - Trash icon button in widget header bar (direct button instead of dropdown — Radix DropdownMenu has event conflicts with react-grid-layout's DraggableCore).
    - Removes the widget instance from the grid and deletes it from SQLite.
    - Shows a shadcn `AlertDialog` confirmation before removing.
 
+**Known Issues:**
+- Radix DropdownMenuTrigger doesn't work inside react-grid-layout items due to pointer event capture conflicts with DraggableCore. Used direct icon buttons (settings gear + trash) instead.
+
 **Verification:**
-- [ ] Clicking "Add Widget" in the top bar opens the catalog panel from the right.
-- [ ] The catalog lists all registered widgets with icons and descriptions.
-- [ ] Searching/filtering narrows the list in real time.
-- [ ] Clicking "Add" on a widget places it on the grid immediately.
-- [ ] The newly added widget is fully functional (context, settings, event bus all work).
-- [ ] Removing a widget from the grid deletes it from the database.
-- [ ] Adding the same widget type multiple times creates separate instances.
+- [x] Clicking "Add Widget" in the top bar opens the catalog panel from the right.
+- [x] The catalog lists all registered widgets with icons and descriptions.
+- [x] Searching/filtering narrows the list in real time.
+- [x] Clicking "Add" on a widget places it on the grid immediately.
+- [x] The newly added widget is fully functional (context, settings, event bus all work).
+- [x] Removing a widget from the grid deletes it from the database.
+- [x] Adding the same widget type multiple times creates separate instances.
 
 ---
 

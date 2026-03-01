@@ -40,6 +40,8 @@ interface LayoutState {
   activeDashboardId: string;
   loadLayout: (dashboardId: string) => Promise<void>;
   updateLayout: (layout: LayoutItem[]) => void;
+  addWidget: (widgetType: string, gridDefaults: { w: number; h: number; minW: number; minH: number }) => Promise<void>;
+  removeWidget: (widgetInstanceId: string) => Promise<void>;
 }
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -127,5 +129,36 @@ export const useLayoutStore = create<LayoutState>((set) => ({
     const { widgets, activeDashboardId } = useLayoutStore.getState();
     set({ layout });
     debouncedSave(layout, widgets, activeDashboardId);
+  },
+
+  addWidget: async (widgetType, gridDefaults) => {
+    const { layout, widgets, activeDashboardId } = useLayoutStore.getState();
+    const id = `${widgetType}-${Date.now()}`;
+    const position = { x: 0, y: Infinity, w: gridDefaults.w, h: gridDefaults.h };
+
+    await invoke('save_widget_instance', {
+      input: {
+        id,
+        widgetType,
+        dashboardId: activeDashboardId,
+        gridPosition: JSON.stringify(position),
+        settings: '{}',
+      },
+    });
+
+    const newLayout: LayoutItem[] = [
+      ...layout,
+      { i: id, ...position, minW: gridDefaults.minW, minH: gridDefaults.minH },
+    ];
+    const newWidgets: WidgetInstanceMeta[] = [...widgets, { id, widgetType }];
+    set({ layout: newLayout, widgets: newWidgets });
+  },
+
+  removeWidget: async (widgetInstanceId) => {
+    await invoke('delete_widget_instance', { widgetInstanceId });
+    set((s) => ({
+      layout: s.layout.filter((item) => item.i !== widgetInstanceId),
+      widgets: s.widgets.filter((w) => w.id !== widgetInstanceId),
+    }));
   },
 }));

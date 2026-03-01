@@ -88,6 +88,27 @@ pub async fn get_widget_instances(
 }
 
 #[tauri::command]
+pub async fn delete_widget_instance(
+    pool: State<'_, SqlitePool>,
+    widget_instance_id: String,
+) -> Result<(), String> {
+    // Delete associated widget data first
+    sqlx::query("DELETE FROM widget_data WHERE widget_instance_id = ?")
+        .bind(&widget_instance_id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    sqlx::query("DELETE FROM widget_instances WHERE id = ?")
+        .bind(&widget_instance_id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn save_widget_data(
     pool: State<'_, SqlitePool>,
     input: SaveWidgetDataInput,

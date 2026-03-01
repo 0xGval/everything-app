@@ -26,6 +26,7 @@ pub fn run() {
             commands::dashboard::delete_dashboard,
             commands::widget::save_widget_instance,
             commands::widget::get_widget_instances,
+            commands::widget::delete_widget_instance,
             commands::widget::save_widget_data,
             commands::widget::get_widget_data,
             commands::widget::log_event,

@@ -1,13 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { GripVertical, Maximize2, Settings, icons, type LucideIcon } from 'lucide-react';
-
-const iconsRecord = icons as Record<string, LucideIcon>;
+import { GripVertical, Maximize2, Settings, Trash2, icons, type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { getWidget } from '@/lib/widget-sdk/registry';
 import { createWidgetContext } from '@/lib/widget-sdk/context';
 import { loadSettings, onSettingsChange } from '@/lib/widget-sdk/settings-cache';
+import { useLayoutStore } from '@/lib/store/layout-store';
 import { WidgetSettingsDialog } from './WidgetSettingsDialog';
+
+const iconsRecord = icons as Record<string, LucideIcon>;
 
 interface WidgetCardProps {
   widgetInstanceId: string;
@@ -20,7 +31,9 @@ export const WidgetCard = React.memo(function WidgetCard({
 }: WidgetCardProps) {
   const definition = getWidget(widgetType);
   const ctx = useMemo(() => createWidgetContext(widgetInstanceId), [widgetInstanceId]);
+  const removeWidget = useLayoutStore((s) => s.removeWidget);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [settingsReady, setSettingsReady] = useState(false);
   const [, setSettingsVersion] = useState(0);
 
@@ -53,7 +66,7 @@ export const WidgetCard = React.memo(function WidgetCard({
           )}
           <span className="flex-1 truncate px-1 text-xs font-medium">{title}</span>
           {definition?.manifest.hasExpandedView && (
-            <Button variant="ghost" size="icon" className="h-6 w-6">
+            <Button variant="ghost" size="icon" className="h-6 w-6" onMouseDown={(e) => e.stopPropagation()}>
               <Maximize2 className="h-3 w-3" />
             </Button>
           )}
@@ -64,6 +77,14 @@ export const WidgetCard = React.memo(function WidgetCard({
             onClick={() => setSettingsOpen(true)}
           >
             <Settings className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground hover:text-destructive"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 className="h-3 w-3" />
           </Button>
         </div>
         <CardContent className="flex-1 overflow-auto p-3">
@@ -80,6 +101,7 @@ export const WidgetCard = React.memo(function WidgetCard({
           )}
         </CardContent>
       </Card>
+
       {definition && (
         <WidgetSettingsDialog
           open={settingsOpen}
@@ -89,6 +111,23 @@ export const WidgetCard = React.memo(function WidgetCard({
           schema={definition.manifest.settings}
         />
       )}
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Widget</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove &quot;{title}&quot;? Its data will be deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => removeWidget(widgetInstanceId)}>
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 });
