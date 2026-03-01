@@ -2,31 +2,13 @@ import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import {
   Responsive as ResponsiveGridLayout,
   verticalCompactor,
-  type LayoutItem,
   type Layout,
   type ResponsiveLayouts,
 } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { WidgetCard } from './WidgetCard';
-
-interface PlaceholderWidget {
-  id: string;
-  title: string;
-  color: string;
-}
-
-const PLACEHOLDER_WIDGETS: PlaceholderWidget[] = [
-  { id: 'a', title: 'Widget A', color: 'bg-blue-500/20 text-blue-400' },
-  { id: 'b', title: 'Widget B', color: 'bg-emerald-500/20 text-emerald-400' },
-  { id: 'c', title: 'Widget C', color: 'bg-amber-500/20 text-amber-400' },
-];
-
-const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'a', x: 0, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
-  { i: 'b', x: 4, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
-  { i: 'c', x: 8, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
-];
+import { useLayoutStore } from '@/lib/store/layout-store';
 
 const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
@@ -38,6 +20,16 @@ export function WidgetGrid() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [rowHeight, setRowHeight] = useState(100);
+
+  const layout = useLayoutStore((s) => s.layout);
+  const widgets = useLayoutStore((s) => s.widgets);
+  const loaded = useLayoutStore((s) => s.loaded);
+  const loadLayout = useLayoutStore((s) => s.loadLayout);
+  const updateLayout = useLayoutStore((s) => s.updateLayout);
+
+  useEffect(() => {
+    loadLayout('default');
+  }, [loadLayout]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -54,15 +46,19 @@ export function WidgetGrid() {
     return () => observer.disconnect();
   }, []);
 
-  const layouts = useMemo<ResponsiveLayouts>(() => ({ lg: DEFAULT_LAYOUT }), []);
+  const layouts = useMemo<ResponsiveLayouts>(() => ({ lg: layout }), [layout]);
 
-  const onLayoutChange = useCallback((_layout: Layout, _layouts: ResponsiveLayouts) => {
-    console.log('layout changed:', _layout);
-  }, []);
+  const onLayoutChange = useCallback(
+    (currentLayout: Layout, _allLayouts: ResponsiveLayouts) => {
+      if (!loaded) return;
+      updateLayout([...currentLayout]);
+    },
+    [loaded, updateLayout],
+  );
 
   return (
     <div ref={containerRef} className="flex-1 overflow-auto p-2">
-      {containerWidth > 0 && (
+      {containerWidth > 0 && loaded && (
         <ResponsiveGridLayout
           layouts={layouts}
           breakpoints={BREAKPOINTS}
@@ -75,7 +71,7 @@ export function WidgetGrid() {
           onLayoutChange={onLayoutChange}
           margin={[8, 8] as const}
         >
-          {PLACEHOLDER_WIDGETS.map((widget) => (
+          {widgets.map((widget) => (
             <div key={widget.id}>
               <WidgetCard title={widget.title}>
                 <div

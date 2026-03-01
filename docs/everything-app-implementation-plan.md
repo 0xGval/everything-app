@@ -208,7 +208,7 @@ everything-app/
 
 ---
 
-### 1.5 — Layout Persistence
+### 1.5 — Layout Persistence — COMPLETE (2026-03-01)
 
 **Goal:** Save and restore the widget grid layout across app restarts.
 
@@ -221,10 +221,10 @@ everything-app/
 5. Handle the first-launch case: if no widget instances exist in the DB, use a default layout with the placeholder widgets.
 
 **Verification:**
-- [ ] On first launch, the default layout is displayed and saved to the DB.
-- [ ] Drag a widget to a new position, close the app, reopen — the widget is in the saved position.
-- [ ] Resize a widget, restart — the size is preserved.
-- [ ] Rearrange multiple widgets, restart — all positions are correct.
+- [x] On first launch, the default layout is displayed and saved to the DB.
+- [x] Drag a widget to a new position, close the app, reopen — the widget is in the saved position.
+- [x] Resize a widget, restart — the size is preserved.
+- [x] Rearrange multiple widgets, restart — all positions are correct.
 
 ---
 
