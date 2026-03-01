@@ -73,13 +73,7 @@ export function WidgetGrid() {
         >
           {widgets.map((widget) => (
             <div key={widget.id}>
-              <WidgetCard title={widget.title}>
-                <div
-                  className={`flex h-full items-center justify-center rounded-md ${widget.color}`}
-                >
-                  <span className="text-sm font-medium">{widget.title}</span>
-                </div>
-              </WidgetCard>
+              <WidgetCard widgetInstanceId={widget.id} widgetType={widget.widgetType} />
             </div>
           ))}
         </ResponsiveGridLayout>

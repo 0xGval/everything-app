@@ -12,38 +12,26 @@ interface WidgetInstanceFromDB {
   updatedAt: string;
 }
 
-interface PlaceholderMeta {
+interface WidgetInstanceMeta {
   id: string;
   widgetType: string;
-  title: string;
-  color: string;
 }
 
-const DEFAULT_WIDGETS: PlaceholderMeta[] = [
-  { id: 'a', widgetType: 'placeholder', title: 'Widget A', color: 'bg-blue-500/20 text-blue-400' },
-  {
-    id: 'b',
-    widgetType: 'placeholder',
-    title: 'Widget B',
-    color: 'bg-emerald-500/20 text-emerald-400',
-  },
-  {
-    id: 'c',
-    widgetType: 'placeholder',
-    title: 'Widget C',
-    color: 'bg-amber-500/20 text-amber-400',
-  },
+const DEFAULT_WIDGETS: WidgetInstanceMeta[] = [
+  { id: 'test-1', widgetType: 'test-widget' },
+  { id: 'test-2', widgetType: 'test-widget' },
+  { id: 'test-3', widgetType: 'test-widget' },
 ];
 
 const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'a', x: 0, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
-  { i: 'b', x: 4, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
-  { i: 'c', x: 8, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'test-1', x: 0, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'test-2', x: 4, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'test-3', x: 8, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
 ];
 
 interface LayoutState {
   layout: LayoutItem[];
-  widgets: PlaceholderMeta[];
+  widgets: WidgetInstanceMeta[];
   loaded: boolean;
   loadLayout: (dashboardId: string) => Promise<void>;
   updateLayout: (layout: LayoutItem[]) => void;
@@ -51,15 +39,20 @@ interface LayoutState {
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
-function debouncedSave(layout: LayoutItem[], dashboardId: string): void {
+function debouncedSave(
+  layout: LayoutItem[],
+  widgets: WidgetInstanceMeta[],
+  dashboardId: string,
+): void {
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
     for (const item of layout) {
+      const widget = widgets.find((w) => w.id === item.i);
       const position = JSON.stringify({ x: item.x, y: item.y, w: item.w, h: item.h });
       invoke('save_widget_instance', {
         input: {
           id: item.i,
-          widgetType: 'placeholder',
+          widgetType: widget?.widgetType ?? 'unknown',
           dashboardId,
           gridPosition: position,
           settings: '{}',
@@ -108,17 +101,10 @@ export const useLayoutStore = create<LayoutState>((set) => ({
           return { i: inst.id, ...pos, minW: 2, minH: 2 };
         });
 
-        const widgets: PlaceholderMeta[] = instances.map((inst) => {
-          const existing = DEFAULT_WIDGETS.find((w) => w.id === inst.id);
-          return (
-            existing ?? {
-              id: inst.id,
-              widgetType: inst.widgetType,
-              title: inst.id,
-              color: 'bg-muted text-muted-foreground',
-            }
-          );
-        });
+        const widgets: WidgetInstanceMeta[] = instances.map((inst) => ({
+          id: inst.id,
+          widgetType: inst.widgetType,
+        }));
 
         set({ layout, widgets, loaded: true });
       }
@@ -129,7 +115,8 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   },
 
   updateLayout: (layout: LayoutItem[]) => {
+    const { widgets } = useLayoutStore.getState();
     set({ layout });
-    debouncedSave(layout, 'default');
+    debouncedSave(layout, widgets, 'default');
   },
 }));

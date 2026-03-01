@@ -228,7 +228,7 @@ everything-app/
 
 ---
 
-### 1.6 — Widget SDK Core (Types, Context, Registry)
+### 1.6 — Widget SDK Core (Types, Context, Registry) — COMPLETE (2026-03-01)
 
 **Goal:** Define the Widget SDK interfaces and build the widget runtime that loads widgets from a registry and injects the WidgetContext.
 
@@ -254,11 +254,11 @@ everything-app/
 5. Create a test widget: move one placeholder to `src/widgets/test-widget/` with a proper manifest and a simple CompactView that displays `ctx.widgetId`.
 
 **Verification:**
-- [ ] The test widget is registered in the registry and appears in the grid.
-- [ ] The widget card header shows the widget's name and icon from the manifest.
-- [ ] The widget's CompactView renders and displays its own `widgetId` from the context.
-- [ ] Calling `ctx.db.set('test', 'hello')` and then `ctx.db.get('test')` returns `'hello'` (data persisted to SQLite).
-- [ ] Other context methods (emit, on, etc.) log to console without errors.
+- [x] The test widget is registered in the registry and appears in the grid.
+- [x] The widget card header shows the widget's name and icon from the manifest.
+- [x] The widget's CompactView renders and displays its own `widgetId` from the context.
+- [x] Calling `ctx.db.set('test', 'hello')` and then `ctx.db.get('test')` returns `'hello'` (data persisted to SQLite).
+- [x] Other context methods (emit, on, etc.) log to console without errors.
 
 ---
 
