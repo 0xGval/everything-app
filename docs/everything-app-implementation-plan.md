@@ -337,7 +337,7 @@ everything-app/
 
 ---
 
-### 1.10 — Dashboard Management
+### 1.10 — Dashboard Management — COMPLETE (2026-03-02)
 
 **Goal:** Support multiple dashboards with create, rename, delete, and switch functionality.
 
@@ -357,13 +357,13 @@ everything-app/
 6. Switching dashboards loads the corresponding widget instances and layout from SQLite.
 
 **Verification:**
-- [ ] The sidebar shows the "Main" default dashboard.
-- [ ] Clicking "+" creates a new dashboard; it appears in the sidebar immediately.
-- [ ] Clicking a different dashboard switches the grid to that dashboard's widgets (empty at first).
-- [ ] Right-click → Rename works and updates the sidebar icon tooltip.
-- [ ] Right-click → Delete removes the dashboard after confirmation (cannot delete the last one).
-- [ ] Dashboards persist across app restarts.
-- [ ] Switching back and forth between dashboards shows the correct widgets each time.
+- [x] The sidebar shows the "Main" default dashboard.
+- [x] Clicking "+" creates a new dashboard; it appears in the sidebar immediately.
+- [x] Clicking a different dashboard switches the grid to that dashboard's widgets (empty at first).
+- [x] Right-click → Rename works and updates the sidebar icon tooltip.
+- [x] Right-click → Delete removes the dashboard after confirmation (cannot delete the last one).
+- [x] Dashboards persist across app restarts.
+- [x] Switching back and forth between dashboards shows the correct widgets each time.
 
 ---
 

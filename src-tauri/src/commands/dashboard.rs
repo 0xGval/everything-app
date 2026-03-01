@@ -51,3 +51,46 @@ pub async fn create_dashboard(
         .await
         .map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub async fn rename_dashboard(
+    pool: State<'_, SqlitePool>,
+    id: String,
+    name: String,
+    icon: String,
+) -> Result<Dashboard, String> {
+    sqlx::query("UPDATE dashboards SET name = ?, icon = ? WHERE id = ?")
+        .bind(&name)
+        .bind(&icon)
+        .bind(&id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    sqlx::query_as::<_, Dashboard>("SELECT * FROM dashboards WHERE id = ?")
+        .bind(&id)
+        .fetch_one(pool.inner())
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_dashboard(
+    pool: State<'_, SqlitePool>,
+    id: String,
+) -> Result<(), String> {
+    // Delete associated widget instances first
+    sqlx::query("DELETE FROM widget_instances WHERE dashboard_id = ?")
+        .bind(&id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    sqlx::query("DELETE FROM dashboards WHERE id = ?")
+        .bind(&id)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}

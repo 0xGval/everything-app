@@ -69,7 +69,7 @@ pub async fn run(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 
 pub async fn seed(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     sqlx::query(
-        "INSERT OR IGNORE INTO dashboards (id, name, icon, sort_order) VALUES ('default', 'Main', 'home', 0)",
+        "INSERT OR IGNORE INTO dashboards (id, name, icon, sort_order) VALUES ('default', 'Main', 'House', 0)",
     )
     .execute(pool)
     .await?;

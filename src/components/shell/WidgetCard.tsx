@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { GripVertical, Maximize2, Settings, icons } from 'lucide-react';
+import { GripVertical, Maximize2, Settings, icons, type LucideIcon } from 'lucide-react';
+
+const iconsRecord = icons as Record<string, LucideIcon>;
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getWidget } from '@/lib/widget-sdk/registry';
@@ -35,10 +37,9 @@ export const WidgetCard = React.memo(function WidgetCard({
   }, [widgetInstanceId]);
 
   const title = definition?.manifest.name ?? widgetType;
-  const IconComponent =
-    definition?.manifest.icon && definition.manifest.icon in icons
-      ? icons[definition.manifest.icon as keyof typeof icons]
-      : null;
+  const IconComponent = definition?.manifest.icon
+    ? iconsRecord[definition.manifest.icon] ?? null
+    : null;
 
   return (
     <>

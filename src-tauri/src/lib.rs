@@ -22,6 +22,8 @@ pub fn run() {
             greet,
             commands::dashboard::get_dashboards,
             commands::dashboard::create_dashboard,
+            commands::dashboard::rename_dashboard,
+            commands::dashboard::delete_dashboard,
             commands::widget::save_widget_instance,
             commands::widget::get_widget_instances,
             commands::widget::save_widget_data,

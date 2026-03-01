@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Responsive as ResponsiveGridLayout,
   verticalCompactor,
@@ -24,12 +24,7 @@ export function WidgetGrid() {
   const layout = useLayoutStore((s) => s.layout);
   const widgets = useLayoutStore((s) => s.widgets);
   const loaded = useLayoutStore((s) => s.loaded);
-  const loadLayout = useLayoutStore((s) => s.loadLayout);
   const updateLayout = useLayoutStore((s) => s.updateLayout);
-
-  useEffect(() => {
-    loadLayout('default');
-  }, [loadLayout]);
 
   useEffect(() => {
     if (!containerRef.current) return;

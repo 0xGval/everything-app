@@ -37,6 +37,7 @@ interface LayoutState {
   layout: LayoutItem[];
   widgets: WidgetInstanceMeta[];
   loaded: boolean;
+  activeDashboardId: string;
   loadLayout: (dashboardId: string) => Promise<void>;
   updateLayout: (layout: LayoutItem[]) => void;
 }
@@ -68,24 +69,28 @@ function debouncedSave(
 
 export const useLayoutStore = create<LayoutState>((set) => ({
   layout: [],
-  widgets: DEFAULT_WIDGETS,
+  widgets: [],
   loaded: false,
+  activeDashboardId: '',
 
   loadLayout: async (dashboardId: string) => {
+    // Reset state while loading
+    set({ loaded: false, activeDashboardId: dashboardId });
+
     try {
       const instances = await invoke<WidgetInstanceFromDB[]>('get_widget_instances', {
         dashboardId,
       });
 
-      if (instances.length === 0) {
-        // First launch: seed defaults to DB and use default layout
+      if (instances.length === 0 && dashboardId === 'default') {
+        // First launch on the default dashboard: seed defaults
         for (const item of DEFAULT_LAYOUT) {
           const widget = DEFAULT_WIDGETS.find((w) => w.id === item.i);
           const position = JSON.stringify({ x: item.x, y: item.y, w: item.w, h: item.h });
           await invoke('save_widget_instance', {
             input: {
               id: item.i,
-              widgetType: widget?.widgetType ?? 'placeholder',
+              widgetType: widget?.widgetType ?? 'unknown',
               dashboardId,
               gridPosition: position,
               settings: '{}',
@@ -94,7 +99,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
         }
         set({ layout: DEFAULT_LAYOUT, widgets: DEFAULT_WIDGETS, loaded: true });
       } else {
-        // Restore from DB
+        // Restore from DB (may be empty for new dashboards)
         const layout: LayoutItem[] = instances.map((inst) => {
           const pos = JSON.parse(inst.gridPosition) as {
             x: number;
@@ -114,13 +119,13 @@ export const useLayoutStore = create<LayoutState>((set) => ({
       }
     } catch (e) {
       console.error('loadLayout failed:', e);
-      set({ layout: DEFAULT_LAYOUT, widgets: DEFAULT_WIDGETS, loaded: true });
+      set({ layout: [], widgets: [], loaded: true });
     }
   },
 
   updateLayout: (layout: LayoutItem[]) => {
-    const { widgets } = useLayoutStore.getState();
+    const { widgets, activeDashboardId } = useLayoutStore.getState();
     set({ layout });
-    debouncedSave(layout, widgets, 'default');
+    debouncedSave(layout, widgets, activeDashboardId);
   },
 }));
