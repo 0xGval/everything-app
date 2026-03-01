@@ -262,7 +262,7 @@ everything-app/
 
 ---
 
-### 1.7 — Event Bus Implementation
+### 1.7 — Event Bus Implementation — COMPLETE (2026-03-02)
 
 **Goal:** Build a working event bus so widgets can emit and listen to events.
 
@@ -281,10 +281,10 @@ everything-app/
 4. Place both widgets on the grid.
 
 **Verification:**
-- [ ] Clicking "Send Event" in the sender widget immediately updates the receiver widget with the timestamp.
-- [ ] Multiple clicks update the receiver each time.
-- [ ] Removing the receiver widget from the grid (or unmounting) does not cause errors when the sender emits.
-- [ ] Events are logged to the `events_log` table in SQLite (check via console or a DB viewer).
+- [x] Clicking "Send Event" in the sender widget immediately updates the receiver widget with the timestamp.
+- [x] Multiple clicks update the receiver each time.
+- [x] Removing the receiver widget from the grid (or unmounting) does not cause errors when the sender emits.
+- [x] Events are logged to the `events_log` table in SQLite (check via console or a DB viewer).
 
 ---
 

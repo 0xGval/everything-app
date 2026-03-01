@@ -130,3 +130,48 @@ pub async fn get_widget_data(
     .await
     .map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub async fn log_event(
+    pool: State<'_, SqlitePool>,
+    event_name: String,
+    payload: String,
+    source_widget_id: Option<String>,
+) -> Result<(), String> {
+    sqlx::query(
+        "INSERT INTO events_log (event_name, payload, source_widget_id) VALUES (?, ?, ?)",
+    )
+    .bind(&event_name)
+    .bind(&payload)
+    .bind(&source_widget_id)
+    .execute(pool.inner())
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[derive(Debug, Serialize, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct EventLogRow {
+    pub id: i64,
+    pub event_name: String,
+    pub payload: String,
+    pub source_widget_id: Option<String>,
+    pub timestamp: String,
+}
+
+#[tauri::command]
+pub async fn get_events_log(
+    pool: State<'_, SqlitePool>,
+    limit: Option<i64>,
+) -> Result<Vec<EventLogRow>, String> {
+    let limit = limit.unwrap_or(50);
+    sqlx::query_as::<_, EventLogRow>(
+        "SELECT * FROM events_log ORDER BY id DESC LIMIT ?",
+    )
+    .bind(limit)
+    .fetch_all(pool.inner())
+    .await
+    .map_err(|e| e.to_string())
+}

@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { WidgetContext } from './types';
+import { eventBus } from './event-bus';
 
 interface WidgetDataRow {
   id: string;
@@ -15,12 +16,11 @@ export function createWidgetContext(widgetInstanceId: string): WidgetContext {
     widgetId: widgetInstanceId,
 
     emit: (event, payload) => {
-      console.log(`[widget:${widgetInstanceId}] emit`, event, payload);
+      eventBus.emit(event, payload, widgetInstanceId);
     },
 
     on: (event, callback) => {
-      console.log(`[widget:${widgetInstanceId}] on`, event, callback);
-      return () => {};
+      return eventBus.on(event, callback);
     },
 
     db: {

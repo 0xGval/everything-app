@@ -1,0 +1,25 @@
+{
+  "id": "event-sender",
+  "name": "Event Sender",
+  "description": "Sends test:ping events via the event bus",
+  "icon": "Send",
+  "type": "native",
+  "grid": {
+    "minW": 2,
+    "minH": 2,
+    "defaultW": 4,
+    "defaultH": 3
+  },
+  "permissions": [],
+  "events": {
+    "emits": ["test:ping"],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": []
+  },
+  "hasExpandedView": false,
+  "hasRustModule": false,
+  "settings": {}
+}

@@ -4,6 +4,8 @@ import App from "./App";
 
 // Widget registrations (side-effect imports)
 import '@/widgets/test-widget/config';
+import '@/widgets/event-sender/config';
+import '@/widgets/event-receiver/config';
 
 import "./index.css";
 
