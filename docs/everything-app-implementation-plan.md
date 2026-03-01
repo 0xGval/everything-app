@@ -104,7 +104,7 @@ everything-app/
 
 ---
 
-### 1.2 — SQLite Database Setup
+### 1.2 — SQLite Database Setup — COMPLETE (2026-03-01)
 
 **Goal:** Initialize the SQLite database on app startup with all core tables, and verify read/write from the frontend.
 
@@ -129,11 +129,11 @@ everything-app/
 6. Test from the frontend by calling `invoke('get_dashboards')` on load and logging the result to the console. **Tauri 2.x note**: import invoke from `@tauri-apps/api/core` (not `@tauri-apps/api/tauri` which was the v1 path).
 
 **Verification:**
-- [ ] On first launch, the SQLite database file is created in the app data directory.
-- [ ] The `dashboards` table contains the seeded "Main" dashboard.
-- [ ] Calling `invoke('get_dashboards')` from the frontend returns the seeded dashboard.
-- [ ] Calling `invoke('create_dashboard', { ... })` and then `get_dashboards` shows the new entry.
-- [ ] The database file persists across app restarts.
+- [x] On first launch, the SQLite database file is created in the app data directory.
+- [x] The `dashboards` table contains the seeded "Main" dashboard.
+- [x] Calling `invoke('get_dashboards')` from the frontend returns the seeded dashboard.
+- [x] Calling `invoke('create_dashboard', { ... })` and then `get_dashboards` shows the new entry.
+- [x] The database file persists across app restarts.
 
 ---
 
