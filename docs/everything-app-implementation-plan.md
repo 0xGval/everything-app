@@ -137,7 +137,7 @@ everything-app/
 
 ---
 
-### 1.3 — Shell Layout (Sidebar + Top Bar + Grid Area)
+### 1.3 — Shell Layout (Sidebar + Top Bar + Grid Area) — COMPLETE (2026-03-01)
 
 **Goal:** Build the static shell layout with sidebar, top bar, and a central area ready for the widget grid.
 
@@ -164,12 +164,12 @@ everything-app/
 6. Apply dark mode as default via the Tailwind CSS variables in `index.css`. Both dark and light mode variables are configured from the start (shadcn/ui generates both). Dark mode is set as default via the `dark` class on `<html>`.
 
 **Verification:**
-- [ ] The app window opens at 1280x800 with the title "Everything App".
-- [ ] The sidebar is visible on the left with the "Main" dashboard icon and settings icon.
-- [ ] The top bar shows "Main" and an "Add Widget" button.
-- [ ] The central area shows the empty placeholder.
-- [ ] Dark mode is applied (dark background, light text).
-- [ ] The layout responds to window resizing without breaking (sidebar stays fixed, grid area expands).
+- [x] The app window opens at 1280x800 with the title "Everything App".
+- [x] The sidebar is visible on the left with the "Main" dashboard icon and settings icon.
+- [x] The top bar shows "Main" and an "Add Widget" button.
+- [x] The central area shows the empty placeholder.
+- [x] Dark mode is applied (dark background, light text).
+- [x] The layout responds to window resizing without breaking (sidebar stays fixed, grid area expands).
 
 ---
 
