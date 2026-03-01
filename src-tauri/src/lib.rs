@@ -28,6 +28,8 @@ pub fn run() {
             commands::widget::get_widget_data,
             commands::widget::log_event,
             commands::widget::get_events_log,
+            commands::widget::update_widget_settings,
+            commands::widget::get_widget_settings,
         ])
         .setup(|app| {
             let app_data_dir = app

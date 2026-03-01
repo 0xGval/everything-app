@@ -18,6 +18,7 @@ interface WidgetInstanceMeta {
 }
 
 const DEFAULT_WIDGETS: WidgetInstanceMeta[] = [
+  { id: 'test-1', widgetType: 'test-widget' },
   { id: 'sender-1', widgetType: 'event-sender' },
   { id: 'receiver-1', widgetType: 'event-receiver' },
   { id: 'writer-1', widgetType: 'counter-writer' },
@@ -25,10 +26,11 @@ const DEFAULT_WIDGETS: WidgetInstanceMeta[] = [
 ];
 
 const DEFAULT_LAYOUT: LayoutItem[] = [
-  { i: 'sender-1', x: 0, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-  { i: 'receiver-1', x: 3, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-  { i: 'writer-1', x: 6, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
-  { i: 'reader-1', x: 9, y: 0, w: 3, h: 3, minW: 2, minH: 2 },
+  { i: 'test-1', x: 0, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'sender-1', x: 4, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'receiver-1', x: 8, y: 0, w: 4, h: 3, minW: 2, minH: 2 },
+  { i: 'writer-1', x: 0, y: 3, w: 6, h: 3, minW: 2, minH: 2 },
+  { i: 'reader-1', x: 6, y: 3, w: 6, h: 3, minW: 2, minH: 2 },
 ];
 
 interface LayoutState {

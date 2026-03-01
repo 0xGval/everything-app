@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { WidgetContext } from './types';
 import { eventBus } from './event-bus';
 import { readSharedState, writeSharedState, subscribeSharedState } from '@/lib/store/shared-state';
+import { getSettingSync, getSettingsSync, setSetting } from './settings-cache';
 
 interface WidgetDataRow {
   id: string;
@@ -73,15 +74,13 @@ export function createWidgetContext(widgetInstanceId: string): WidgetContext {
 
     settings: {
       get: (key) => {
-        console.log(`[widget:${widgetInstanceId}] settings.get stub`, key);
-        return undefined;
+        return getSettingSync(widgetInstanceId, key);
       },
       set: async (key, value) => {
-        console.log(`[widget:${widgetInstanceId}] settings.set stub`, key, value);
+        await setSetting(widgetInstanceId, key, value);
       },
       getAll: () => {
-        console.log(`[widget:${widgetInstanceId}] settings.getAll stub`);
-        return {};
+        return getSettingsSync(widgetInstanceId);
       },
     },
 

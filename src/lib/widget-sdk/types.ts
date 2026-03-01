@@ -9,6 +9,13 @@ export interface GridConstraints {
   defaultH: number;
 }
 
+export interface SettingSchema {
+  type: 'string' | 'number' | 'boolean' | 'select';
+  label: string;
+  default: unknown;
+  options?: { label: string; value: string }[];
+}
+
 export interface WidgetManifest {
   id: string;
   name: string;
@@ -27,7 +34,7 @@ export interface WidgetManifest {
   };
   hasExpandedView: boolean;
   hasRustModule: boolean;
-  settings: Record<string, unknown>;
+  settings: Record<string, SettingSchema>;
 }
 
 export type UnsubscribeFn = () => void;

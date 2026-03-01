@@ -21,5 +21,25 @@
   },
   "hasExpandedView": false,
   "hasRustModule": false,
-  "settings": {}
+  "settings": {
+    "refreshInterval": {
+      "type": "number",
+      "label": "Refresh interval (seconds)",
+      "default": 30
+    },
+    "showTimestamp": {
+      "type": "boolean",
+      "label": "Show timestamp",
+      "default": true
+    },
+    "displayMode": {
+      "type": "select",
+      "label": "Display mode",
+      "default": "compact",
+      "options": [
+        { "label": "Compact", "value": "compact" },
+        { "label": "Detailed", "value": "detailed" }
+      ]
+    }
+  }
 }

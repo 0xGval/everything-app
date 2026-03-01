@@ -162,6 +162,40 @@ pub struct EventLogRow {
 }
 
 #[tauri::command]
+pub async fn update_widget_settings(
+    pool: State<'_, SqlitePool>,
+    widget_instance_id: String,
+    settings: String,
+) -> Result<(), String> {
+    sqlx::query(
+        "UPDATE widget_instances SET settings = ?, updated_at = datetime('now') WHERE id = ?",
+    )
+    .bind(&settings)
+    .bind(&widget_instance_id)
+    .execute(pool.inner())
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_widget_settings(
+    pool: State<'_, SqlitePool>,
+    widget_instance_id: String,
+) -> Result<String, String> {
+    let row: (String,) = sqlx::query_as(
+        "SELECT settings FROM widget_instances WHERE id = ?",
+    )
+    .bind(&widget_instance_id)
+    .fetch_one(pool.inner())
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(row.0)
+}
+
+#[tauri::command]
 pub async fn get_events_log(
     pool: State<'_, SqlitePool>,
     limit: Option<i64>,

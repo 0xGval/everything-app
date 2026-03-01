@@ -313,7 +313,7 @@ everything-app/
 
 ---
 
-### 1.9 — Widget Settings System
+### 1.9 — Widget Settings System — COMPLETE (2026-03-02)
 
 **Goal:** Allow each widget to have configurable settings, stored in SQLite, accessible via the context, and editable through a dialog.
 
@@ -329,11 +329,11 @@ everything-app/
 4. Display the current setting value inside the test widget to confirm it updates.
 
 **Verification:**
-- [ ] Clicking the gear icon on a widget card opens the settings dialog.
-- [ ] The dialog displays the correct fields based on the manifest schema.
-- [ ] Changing a setting and saving updates the widget's behavior/display immediately.
-- [ ] Closing and reopening the app preserves the changed settings.
-- [ ] The dialog is styled correctly with shadcn components in dark mode.
+- [x] Clicking the gear icon on a widget card opens the settings dialog.
+- [x] The dialog displays the correct fields based on the manifest schema.
+- [x] Changing a setting and saving updates the widget's behavior/display immediately.
+- [x] Closing and reopening the app preserves the changed settings.
+- [x] The dialog is styled correctly with shadcn components in dark mode.
 
 ---
 
