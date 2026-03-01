@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { WidgetContext } from './types';
 import { eventBus } from './event-bus';
+import { readSharedState, writeSharedState, subscribeSharedState } from '@/lib/store/shared-state';
 
 interface WidgetDataRow {
   id: string;
@@ -60,15 +61,13 @@ export function createWidgetContext(widgetInstanceId: string): WidgetContext {
 
     sharedState: {
       read: (namespace) => {
-        console.log(`[widget:${widgetInstanceId}] sharedState.read stub`, namespace);
-        return undefined;
+        return readSharedState(namespace);
       },
       write: (namespace, value) => {
-        console.log(`[widget:${widgetInstanceId}] sharedState.write stub`, namespace, value);
+        writeSharedState(namespace, value);
       },
-      subscribe: (namespace, _callback) => {
-        console.log(`[widget:${widgetInstanceId}] sharedState.subscribe stub`, namespace);
-        return () => {};
+      subscribe: (namespace, callback) => {
+        return subscribeSharedState(namespace, callback);
       },
     },
 

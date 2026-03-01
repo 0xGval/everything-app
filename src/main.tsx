@@ -6,6 +6,8 @@ import App from "./App";
 import '@/widgets/test-widget/config';
 import '@/widgets/event-sender/config';
 import '@/widgets/event-receiver/config';
+import '@/widgets/counter-writer/config';
+import '@/widgets/counter-reader/config';
 
 import "./index.css";
 
