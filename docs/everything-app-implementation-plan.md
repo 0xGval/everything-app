@@ -173,7 +173,7 @@ everything-app/
 
 ---
 
-### 1.4 — Widget Grid with react-grid-layout
+### 1.4 — Widget Grid with react-grid-layout — COMPLETE (2026-03-01)
 
 **Goal:** Integrate react-grid-layout into the grid area with placeholder widgets that can be dragged and resized.
 
@@ -195,12 +195,16 @@ everything-app/
 6. Wire up drag and resize: on layout change, log the new layout to the console.
 
 **Verification:**
-- [ ] The grid area shows 2-3 placeholder widgets in cards.
-- [ ] Each widget card has a title bar with the grip handle, expand, and settings icons.
-- [ ] Widgets can be dragged by the handle and snap to the grid.
-- [ ] Widgets can be resized via the bottom-right handle and respect grid snapping.
-- [ ] Other widgets reflow when one is moved (vertical compaction).
-- [ ] The layout change is logged to the console with updated positions.
+- [x] The grid area shows 2-3 placeholder widgets in cards.
+- [x] Each widget card has a title bar with the grip handle, expand, and settings icons.
+- [x] Widgets can be dragged by the handle and snap to the grid.
+- [x] Widgets can be resized via the bottom-right handle and respect grid snapping.
+- [x] Other widgets reflow when one is moved (vertical compaction).
+- [x] The layout change is logged to the console with updated positions.
+
+**Known Issues:**
+- react-grid-layout v2 API restructured: `draggableHandle` → `dragConfig.handle`, `compactType` → `compactor` (import `verticalCompactor`), `resizeHandles` → `resizeConfig.handles`. Update CLAUDE.md if referencing old prop names.
+- shadcn `CardHeader` uses `grid` + `items-start` which conflicts with flex centering — use plain `div` for widget card headers instead.
 
 ---
 
