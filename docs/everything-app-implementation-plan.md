@@ -867,21 +867,7 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ### 3.5 — Voice → Tasks Integration
 
-**Goal:** When a voice transcription is ready, the Daily Tasks widget offers to create a task from it.
-
-**Steps:**
-
-1. In the Daily Tasks widget, subscribe to `voice:transcription_ready`.
-2. When received, show a toast or an inline prompt: "New voice note: '[transcription preview]'. Create task?" with "Yes" / "Dismiss" buttons.
-3. Clicking "Yes" creates a task with the transcription as the title (truncated if too long) and the full transcription in the task notes/description.
-4. The new task appears in the task list immediately.
-
-**Verification:**
-- [ ] Recording a voice note triggers a prompt in the Daily Tasks widget.
-- [ ] Accepting creates a correctly titled task.
-- [ ] Dismissing does not create a task.
-- [ ] The full transcription is preserved in the task description/notes.
-- [ ] This works both from the full widget and from mini-mode voice recording.
+**SKIPPED** — Removed on 2026-03-02. Auto-creating tasks from voice transcriptions adds complexity with limited practical value. Users can manually copy transcriptions to tasks via clipboard. May revisit in a future phase.
 
 ---
 
