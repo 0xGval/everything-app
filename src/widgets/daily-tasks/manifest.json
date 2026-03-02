@@ -13,7 +13,7 @@
   "permissions": ["database", "notifications"],
   "events": {
     "emits": ["task:created", "task:completed"],
-    "listens": []
+    "listens": ["craving:resisted"]
   },
   "sharedState": {
     "reads": [],

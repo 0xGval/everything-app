@@ -619,7 +619,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.4 — Inter-Widget Communication: Craving ↔ Tasks
+### 2.4 — Inter-Widget Communication: Craving ↔ Tasks — COMPLETE (2026-03-02)
 
 **Goal:** When a craving is resisted, the Daily Tasks widget auto-completes a recurring "manage craving" task.
 
@@ -632,10 +632,10 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 5. Update the Craving widget to also write to shared state: `craving:stats` with latest streak info.
 
 **Verification:**
-- [ ] With both widgets on the dashboard, resisting a craving automatically checks the health task.
-- [ ] A toast notification appears confirming the auto-completion.
-- [ ] If the task was already completed, nothing breaks (idempotent).
-- [ ] The event flow works across dashboards (if the task widget is on a different dashboard, it still processes the event when it mounts).
+- [x] With both widgets on the dashboard, resisting a craving automatically checks the health task.
+- [x] A toast notification appears confirming the auto-completion.
+- [x] If the task was already completed, nothing breaks (idempotent — counter increments instead of duplicating).
+- [x] The event flow works across dashboards (if the task widget is on a different dashboard, it still processes the event when it mounts).
 
 ---
 

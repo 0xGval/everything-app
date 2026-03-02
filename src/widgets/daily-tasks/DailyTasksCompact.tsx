@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Plus, Repeat } from 'lucide-react';
+import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,58 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
+
+  // Listen for craving:resisted → auto-complete a "Manage craving today" health task with counter
+  useEffect(() => {
+    const CRAVING_TASK_BASE = 'Manage craving today';
+
+    const unsub = ctx.on('craving:resisted', async () => {
+      const allStored = ((await ctx.db.get('tasks')) as Task[] | undefined) ?? [];
+
+      // Find existing craving task for today (title starts with base)
+      const existing = allStored.find(
+        (t) => t.dueDate === today && t.title.startsWith(CRAVING_TASK_BASE),
+      );
+
+      let updated: Task[];
+
+      if (existing) {
+        // Extract current count and increment
+        const match = existing.title.match(/\(\u00d7(\d+)\)$/);
+        const count = match ? parseInt(match[1], 10) + 1 : 2;
+        const newTitle = `${CRAVING_TASK_BASE} (\u00d7${count})`;
+
+        updated = allStored.map((t) =>
+          t.id === existing.id ? { ...t, title: newTitle, isCompleted: true } : t,
+        );
+      } else {
+        // Create a new craving task
+        const newTask: Task = {
+          id: `task-${Date.now()}`,
+          title: CRAVING_TASK_BASE,
+          isCompleted: true,
+          dueDate: today,
+          createdAt: new Date().toISOString(),
+          category: 'Health',
+          recurring: 'daily',
+        };
+        updated = [...allStored, newTask];
+      }
+
+      await ctx.db.set('tasks', updated);
+
+      // Refresh local state
+      setTasks(updated.filter((t) => t.dueDate === today));
+
+      const completedCount = updated.filter((t) => t.dueDate === today && t.isCompleted).length;
+      const totalCount = updated.filter((t) => t.dueDate === today).length;
+      ctx.sharedState.write('tasks:today', { total: totalCount, completed: completedCount });
+
+      toast.success('Craving resisted! Task completed.');
+    });
+
+    return unsub;
+  }, [ctx, today]);
 
   const saveTasks = useCallback(
     async (updated: Task[]) => {
