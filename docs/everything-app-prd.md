@@ -39,7 +39,7 @@ Everything App solves this by providing a single, extensible desktop environment
 - Provide a drag-and-drop widget grid system with persistent layout.
 - Define a Widget SDK that makes it straightforward to develop, register, and load new widgets.
 - Enable inter-widget communication through an event bus and shared state, so widgets can react to each other without tight coupling.
-- Support both native widgets (React components with optional Rust backend modules) and web widgets (embedded external websites via separate Tauri WebviewWindows).
+- Support both native widgets (React components with optional Rust backend modules) and web widgets (embedded external websites via inline `<iframe>` elements).
 - Include a system tray icon so the app stays accessible when minimized.
 - Support multiple dashboards (e.g., "Work", "Health", "Personal") that the user can switch between.
 
@@ -73,7 +73,7 @@ The primary user is the developer/creator of the app (dogfooding). The app is de
 
 | Layer | Technology | Rationale |
 |-------|-----------|-----------|
-| Desktop framework | Tauri 2.10.x | Native performance, small binary size (~5-10 MB vs 150+ MB Electron), system-level access via Rust, WebviewWindow support for web widgets |
+| Desktop framework | Tauri 2.10.x | Native performance, small binary size (~5-10 MB vs 150+ MB Electron), system-level access via Rust |
 | Frontend | React 18.3.1 + TypeScript | Component-based architecture ideal for widgets, strong typing, large ecosystem. React 18 chosen over 19 for react-grid-layout compatibility. |
 | Backend | Rust 1.93.x stable | Memory safety, high performance, direct access to OS APIs (audio, filesystem, notifications) |
 | Bundler | Vite 7.x | Fast HMR in development, optimized production builds |
@@ -142,7 +142,7 @@ The Tauri backend handles all system-level operations: database access, micropho
 │                   Shell                      │
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐     │
 │  │Widget A │  │Widget B │  │Widget C │     │
-│  │ (React) │  │ (React) │  │(WebView)│     │
+│  │ (React) │  │ (React) │  │(iframe) │     │
 │  └────┬────┘  └────┬────┘  └────┬────┘     │
 │       │             │             │          │
 │  ┌────▼─────────────▼─────────────▼────┐    │
@@ -263,37 +263,37 @@ widgets/
 }
 ```
 
-### 7.3 WebView Widget Manifest
+### 7.3 Web Widget Manifest
 
-For widgets that embed external websites:
+For widgets that embed external websites via `<iframe>`:
 
 ```json
 {
-  "id": "gmail-widget",
-  "name": "Gmail",
-  "description": "Gmail inbox embedded view",
-  "version": "1.0.0",
-  "icon": "mail",
-  "type": "webview",
-  "url": "https://mail.google.com",
+  "id": "web-widget",
+  "name": "Web Widget",
+  "description": "Embed any website in a dashboard widget",
+  "icon": "Globe",
+  "type": "web",
   "grid": {
-    "defaultWidth": 4,
-    "defaultHeight": 3,
-    "minWidth": 3,
-    "minHeight": 2,
-    "maxWidth": 12,
-    "maxHeight": 8
+    "minW": 2,
+    "minH": 2,
+    "maxW": 12,
+    "maxH": 8,
+    "defaultW": 4,
+    "defaultH": 3
   },
   "permissions": [],
-  "webviewOptions": {
-    "showNavigation": true,
-    "allowExternalLinks": false,
-    "persistSession": true
-  },
-  "hasExpandedView": true,
-  "hasRustModule": false
+  "events": { "emits": [], "listens": [] },
+  "sharedState": { "reads": [], "writes": [] },
+  "hasExpandedView": false,
+  "hasRustModule": false,
+  "settings": {
+    "url": { "type": "string", "label": "Website URL", "default": "https://example.com" }
+  }
 }
 ```
+
+**Known limitation:** Some sites block iframe embedding via `X-Frame-Options` or CSP `frame-ancestors` headers (e.g., Google, Twitter). These sites will show an error. The majority of websites, documentation sites, dashboards, and tools work correctly.
 
 ### 7.4 WidgetContext API
 
@@ -519,29 +519,28 @@ The SQLite database file can be copied or backed up as a single file. Future ver
 
 ---
 
-## 10. WebView Widget System
+## 10. Web Widget System
 
 ### 10.1 Overview
 
-WebView widgets embed external websites using separate Tauri `WebviewWindow` instances. Each WebView widget creates a dedicated OS-level window managed by the Rust backend, positioned over the widget's grid area. This approach bypasses iframe restrictions (`X-Frame-Options`, CSP `frame-ancestors`) and avoids the instability of Tauri's experimental multiwebview feature (which is behind an `unstable` feature flag with known positioning bugs).
+Web widgets embed external websites using standard HTML `<iframe>` elements rendered inline within the widget card's content area. This is the simplest, most scalable approach: iframes are part of the DOM, follow the grid layout automatically, require no coordinate tracking or IPC, and scale to any number of concurrent widgets.
 
 ### 10.2 Implementation Details
 
-- Each WebView widget instance owns a dedicated `WebviewWindow` created via `WebviewWindowBuilder` in the Rust backend.
-- The Rust backend tracks the position and size of each WebView widget. When the grid layout changes (drag, resize, scroll), the frontend sends updated coordinates and the backend repositions the `WebviewWindow` accordingly.
-- **Important**: Window creation commands in Rust must be `async` to avoid deadlocks on Windows.
-- WebView2 sessions are persisted independently using `data_directory()` on the `WebviewWindowBuilder` (cookies, local storage), so the user remains logged in across app restarts.
-- An optional mini toolbar above the embedded site provides: back/forward navigation, refresh, URL display, and zoom controls.
+- Each web widget renders an `<iframe>` with `src` set to the configured URL.
+- The iframe fills the widget card content area (100% width and height).
+- The `sandbox` attribute is set to `allow-scripts allow-same-origin allow-forms allow-popups` for reasonable security defaults.
+- URL changes via the settings dialog update the iframe `src` dynamically.
+- No Rust backend involvement needed — the iframe is entirely frontend.
 
 ### 10.3 Known Constraints and Mitigations
 
 | Constraint | Mitigation |
 |-----------|-----------|
-| Z-ordering: WebviewWindow renders above all React content | Hide WebView windows when modals, menus, or panels are active; restore when dismissed |
-| Grid sync latency: slight lag when dragging | Throttle position updates; use CSS transition on the placeholder to mask it |
-| No event bus integration by default | Optional: inject a bridge script to allow communication between embedded site and the app event bus |
-| Resource usage: each WebviewWindow consumes ~50-80MB memory | Limit concurrent WebView widgets (recommended max: 4-5); lazy-load when scrolled into view |
-| Window focus: separate OS windows may steal focus from main window | Manage focus explicitly via Tauri window APIs |
+| Some sites block iframe embedding (`X-Frame-Options`, CSP `frame-ancestors`) | Show a clear error state with the option to open the URL in the system browser. Most documentation sites, dashboards, and tools work fine. |
+| No session persistence across app restarts | Tauri's WebView2 manages its own cookie/storage context; sessions persist within the same app session and often across restarts. |
+| No cross-origin event bus integration | Optional future enhancement: inject `postMessage` bridge for communication between iframe content and app event bus. |
+| Iframe content cannot be inspected for navigation state | Toolbar with back/forward not feasible for cross-origin; provide a refresh button and "open in browser" fallback. |
 
 ---
 
@@ -628,17 +627,17 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 
 **Purpose:** Embed any external website within the dashboard.
 
-**Compact view:** Website rendered via a separate Tauri `WebviewWindow` positioned over the grid area, with a thin toolbar (title, refresh button).
+**Compact view:** Website rendered via an inline `<iframe>` that fills the widget card content area. Includes a loading spinner and error state for sites that block iframe embedding.
 
-**Expanded view:** Full-page website view with navigation toolbar (back, forward, refresh, URL bar, zoom).
+**Expanded view:** Full-page iframe view with a toolbar (refresh, open in browser).
 
-**Configuration:** URL, display name, custom icon, toolbar visibility, auto-refresh interval (optional).
+**Configuration:** URL (primary setting).
 
 **Events emitted:** None.
 
 **Events listened:** None.
 
-**Permissions:** `webview`.
+**Permissions:** None (iframes are standard HTML).
 
 ---
 
@@ -675,8 +674,7 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 **Deliverables:**
 - **Voice Recorder & Transcription Widget** (Rust audio module, Whisper integration).
 - Event integration: voice transcription → task creation suggestion.
-- **Generic Web Widget** (Tauri WebviewWindow, session persistence, navigation toolbar).
-- WebviewWindow z-ordering and grid sync management.
+- **Generic Web Widget** (inline iframe, URL configuration, error handling for blocked sites).
 
 ### Phase 4 — Polish & Expand
 
@@ -699,18 +697,18 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 - App startup: under 2 seconds to fully interactive state.
 - Widget loading: under 200ms per widget.
 - Grid drag/resize: 60fps with no visible lag.
-- Memory usage: under 150MB base, plus ~50-80MB per active WebView widget.
+- Memory usage: under 150MB base. Web widgets (iframes) add minimal overhead since they share the main WebView2 process.
 - Binary size: under 15MB (excluding Whisper model).
 
 ### 13.2 Reliability
 
 - All data persisted locally; no data loss on crash (SQLite WAL mode).
 - Widget errors are isolated: a crashing widget does not affect the shell or other widgets.
-- Graceful degradation: if a WebView widget fails to load, show an error state with retry option.
+- Graceful degradation: if a web widget iframe fails to load (site blocks embedding), show an error state with "open in browser" option.
 
 ### 13.3 Security
 
-- WebView widgets run in sandboxed WebView2 instances.
+- Web widget iframes use the `sandbox` attribute (`allow-scripts allow-same-origin allow-forms allow-popups`) to limit capabilities.
 - Widget permissions are declared in manifests and enforced by the runtime.
 - No remote code execution: all widget code is bundled locally.
 - SQLite database is stored in the user's app data directory with standard OS-level file permissions.
@@ -728,11 +726,10 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|-----------|-----------|
-| Tauri WebviewWindow z-ordering and positioning | WebView widgets may have visual glitches when overlays are shown or during drag operations | Medium | Use separate `WebviewWindow` instances (not unstable multiwebview). Implement a `WebViewOverlayManager` to hide/show windows when dialogs/sheets open. Start with native widgets in Phase 1-2; test WebView extensively in Phase 3. |
+| Some websites block iframe embedding | Sites with `X-Frame-Options: DENY` or restrictive CSP won't render in web widgets | Medium | Show clear error state with "open in browser" fallback. Most documentation, dashboards, and tools work fine. |
 | Whisper model is large (~75MB for base, ~1.5GB for large) | Increases app download size if bundled | Medium | Download the base model on first use of the Voice Widget (not bundled). Keep initial binary small (~15MB). Allow user to download larger models optionally. |
 | Grid performance degrades with many widgets | Laggy UX with 10+ widgets | Low | Implement virtualization for off-screen widgets; limit grid to a reasonable max (e.g., 20 widgets per dashboard) |
 | Rust learning curve | Slower initial development velocity | Medium | Keep Rust code minimal in Phase 1-2 (only DB and system APIs); increase Rust usage gradually |
-| WebviewWindow z-ordering conflicts with React UI | Visual glitches when overlays are shown | High | Implement a `WebViewOverlayManager` service that hides/shows WebviewWindows based on UI state (dialogs, sheets, menus) |
 
 ---
 

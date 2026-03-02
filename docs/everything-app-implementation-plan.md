@@ -729,7 +729,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ## PHASE 3 — VOICE & WEB
 
-Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcription) and the Generic Web Widget (Tauri WebviewWindow).
+Phase 3 adds the Voice Recorder widget (Rust audio capture + Groq transcription) and the Generic Web Widget (inline iframe).
 
 ---
 
@@ -871,84 +871,81 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ---
 
-### 3.6 — Generic Web Widget (Basic WebView)
+### 3.6 — Generic Web Widget (Iframe) — COMPLETE (2026-03-02)
 
-**Goal:** Embed an external website in a widget using separate Tauri `WebviewWindow` instances (not the unstable multiwebview feature).
+**Goal:** Embed an external website in a widget using an inline `<iframe>` element.
 
 **Steps:**
 
-1. Create the Rust commands for WebView management (all commands MUST be `async` to avoid deadlocks on Windows):
-   - `create_web_window(id: String, url: String, x: f64, y: f64, width: f64, height: f64)` — creates a new `WebviewWindow` via `WebviewWindowBuilder` positioned at the specified coordinates. Use `decorations(false)` for a borderless window. Set `data_directory()` for session persistence.
-   - `update_web_window_position(id: String, x: f64, y: f64, width: f64, height: f64)` — repositions and resizes an existing `WebviewWindow`.
-   - `destroy_web_window(id: String)` — closes and destroys a `WebviewWindow`.
-   - `web_window_navigate(id: String, url: String)` — navigates to a new URL.
-   - `hide_web_window(id: String)` / `show_web_window(id: String)` — for z-ordering management.
-2. Create `src/widgets/web-widget/manifest.json` (type: `webview`).
-3. Create `WebWidgetCompact.tsx`:
-   - On mount: calculate the card content area's screen coordinates and call `create_web_window`.
-   - On unmount: call `destroy_web_window`.
-   - Use a `ResizeObserver` and grid layout change events to call `update_web_window_position` when the card moves or resizes.
-4. Use a placeholder URL (e.g., `https://example.com`) for initial testing.
+1. Create `src/widgets/web-widget/manifest.json` — type: `"web"`, icon: `Globe`, grid constraints (minW 2, minH 2, maxW 12, maxH 8, defaultW 4, defaultH 3), settings: `url` (string, default `https://example.com`).
+2. Create `WebWidgetCompact.tsx`:
+   - Render an `<iframe>` that fills the card content area (`w-full h-full border-0`).
+   - Set `sandbox="allow-scripts allow-same-origin allow-forms allow-popups"` for security.
+   - Read URL from `ctx.settings.get('url')` with `normalizeUrl()` helper that auto-prefixes `https://` if missing.
+   - Show loading spinner while iframe loads (`onLoad` event).
+   - Bottom bar always visible: truncated URL display + "Open in browser" icon link (ExternalLink) as fallback for sites that block iframes.
+   - Listen for settings changes via `onSettingsChange` to update the iframe `src`.
+3. Create `WebWidgetExpanded.tsx` — placeholder for Phase 3.7.
+4. Create `config.ts` — standard widget registration.
+5. Register in `main.tsx`.
+
+**Architecture decision:** Originally planned with separate Tauri `WebviewWindow` instances, but switched to inline `<iframe>` elements. The WebviewWindow approach was fragile (coordinate tracking, z-ordering, IPC overhead) and non-scalable. Iframes are simple, inline in the DOM, and scale to any number of widgets. Trade-off: some sites block iframe embedding, but most work fine.
 
 **Verification:**
-- [ ] Adding a Web Widget from the catalog creates a `WebviewWindow` showing the configured URL.
-- [ ] The website is fully interactive (can click links, scroll, fill forms).
-- [ ] A site that blocks iframes (e.g., `https://www.google.com`) loads correctly (since this is a separate window, not an iframe).
-- [ ] Dragging the widget in the grid repositions the `WebviewWindow` correctly.
-- [ ] Resizing the widget resizes the `WebviewWindow`.
-- [ ] Removing the widget destroys the `WebviewWindow`.
+- [x] Adding a Web Widget from the catalog shows the configured URL inside the widget card.
+- [x] The website is fully interactive (can click links, scroll, fill forms).
+- [x] Dragging/resizing the widget works — the iframe follows automatically (it's inline DOM).
+- [x] Removing the widget works cleanly.
+- [x] Changing URL in settings navigates to the new URL.
+- [x] Adding 2+ web widgets works independently.
+- [x] URL without `https://` prefix is auto-normalized (e.g., `wikipedia.org` → `https://wikipedia.org`).
+- [x] Bottom bar with URL and "Open in browser" link always visible as fallback.
+
+**Known issues:** Sites that block iframes (Google, Twitter) show a blank frame — user can click "Open in browser" as fallback. Cannot detect iframe blocking client-side.
 
 ---
 
-### 3.7 — Web Widget Navigation and Configuration
+### 3.7 — Web Widget Enhanced View and Toolbar
 
-**Goal:** Add navigation controls, URL configuration, and session persistence.
+**Goal:** Add a compact toolbar and expanded view for the web widget.
 
 **Steps:**
 
-1. Add a thin toolbar above the WebView area:
-   - Back/Forward buttons (shadcn `Button` ghost).
-   - Refresh button.
-   - URL display (read-only, truncated).
-   - Expand button to open in expanded view.
-2. In widget settings dialog, allow the user to configure:
-   - URL (primary).
-   - Display name (for the card title).
-   - Custom icon (Lucide icon name).
-   - Show/hide navigation toolbar.
-3. Session persistence: configured via `data_directory()` on the `WebviewWindowBuilder` so cookies and login sessions survive app restarts.
-4. Implement the expanded view: a full-page `WebviewWindow` with a full navigation bar (including editable URL field).
+1. Add a thin toolbar inside `WebWidgetCompact.tsx` above the iframe:
+   - Refresh button (reloads iframe by toggling a key).
+   - "Open in browser" button (opens the URL in the system default browser via `tauri-plugin-opener`).
+   - URL display (read-only, truncated, muted text).
+2. Implement `WebWidgetExpanded.tsx`:
+   - Full-page iframe view.
+   - Toolbar with: refresh, open in browser, URL display.
+3. Set `hasExpandedView: true` in manifest.
 
 **Verification:**
-- [ ] The toolbar shows back/forward/refresh buttons that work correctly.
-- [ ] Changing the URL in settings reloads the WebView with the new URL.
-- [ ] Login to a site (e.g., Gmail) persists after restarting the app.
-- [ ] Expanding the web widget shows a full-page view with navigation.
-- [ ] The display name appears in the widget card title.
+- [ ] Refresh button reloads the iframe content.
+- [ ] "Open in browser" opens the URL in the default system browser.
+- [ ] Expanding the web widget shows a full-page iframe view.
+- [ ] URL display shows the current configured URL.
 
 ---
 
-### 3.8 — WebView Z-Ordering Management
+### 3.8 — Web Widget Error Handling
 
-**Goal:** Handle the z-ordering conflict between `WebviewWindow` overlays and React UI elements.
+**Goal:** Detect and handle sites that block iframe embedding.
 
 **Steps:**
 
-1. Create a `WebViewOverlayManager` service:
-   - Tracks all active WebView widget IDs.
-   - Provides `hideAll()` and `showAll()` methods that call the Rust backend to hide/show `WebviewWindow` instances via `hide_web_window` / `show_web_window` commands.
-2. Integrate with the shell:
-   - When any shadcn `Dialog`, `Sheet`, `DropdownMenu`, or `AlertDialog` opens → call `hideAll()`.
-   - When they close → call `showAll()`.
-   - When the expanded view is active for a non-web widget → hide WebViews.
-3. Test with multiple Web Widgets and various overlay scenarios.
+1. Implement iframe load detection:
+   - `onLoad` event on the iframe to detect successful load.
+   - Timeout fallback (5s): if no `onLoad` fires, assume the site may have blocked embedding.
+   - Show an error state with the URL and an "Open in browser" button.
+2. Add a `pointer-events: none` overlay during grid drag operations to prevent the iframe from capturing mouse events.
+3. Test with various sites: Wikipedia (works), Google (blocked), GitHub docs (works), etc.
 
 **Verification:**
-- [ ] Opening the widget catalog (Sheet) hides all WebviewWindows; closing restores them.
-- [ ] Opening a settings dialog hides WebviewWindows.
-- [ ] Right-click context menus on widget cards are not obscured by WebviewWindows.
-- [ ] Expanding a non-web widget hides all WebviewWindows.
-- [ ] No visual flicker during hide/show transitions.
+- [ ] Sites that allow iframes load and display correctly.
+- [ ] Sites that block iframes show an error state with "Open in browser" option.
+- [ ] Dragging the widget card works smoothly (iframe doesn't steal mouse events).
+- [ ] No console errors or unhandled promise rejections.
 
 ---
 
@@ -959,14 +956,13 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 **Steps:**
 
 1. Full scenario:
-   - Dashboard has: Daily Tasks, Craving Control, Voice Recorder, and two Web Widgets (e.g., Gmail, Google Calendar).
-   - Record a voice note → transcription completes → task created.
-   - Resist a craving → task auto-completed → notification shown.
-   - Navigate in Gmail widget → login persists.
-   - Open settings → WebviewWindows hide correctly.
+   - Dashboard has: Daily Tasks, Craving Control, Voice Recorder, and two Web Widgets (e.g., Wikipedia, a docs site).
+   - Record a voice note → transcription completes.
+   - Resist a craving → notification shown.
+   - Interact with web widgets → sites are navigable.
    - Rearrange all widgets → layout persists.
 2. Performance testing:
-   - Memory usage with 2 WebView widgets active.
+   - Memory usage with 2 web widget iframes active.
    - Grid drag smoothness with all widgets loaded.
    - Voice transcription time with various audio lengths.
 3. Stress test: add maximum number of widgets, ensure stability.
@@ -974,8 +970,8 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 **Verification:**
 - [ ] All five widgets work simultaneously without conflicts.
 - [ ] Inter-widget events flow correctly across all widgets.
-- [ ] Memory usage is under 300MB with 2 WebviewWindows.
-- [ ] No UI glitches, z-ordering issues, or layout bugs.
+- [ ] Memory usage is under 200MB with 2 web widget iframes.
+- [ ] No UI glitches or layout bugs.
 - [ ] App starts in under 3 seconds with all widgets.
 
 ---
@@ -1057,7 +1053,7 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 **Steps:**
 
 1. **Widget lazy loading:** widgets outside the visible viewport are unmounted and replaced with a lightweight placeholder. Re-mount when scrolled into view using `IntersectionObserver`.
-2. **WebView throttling:** `WebviewWindow` instances that are scrolled out of view are hidden (call Rust to hide/suspend the window).
+2. **Iframe throttling:** web widget iframes that are scrolled out of view can be unmounted to free resources.
 3. **Event bus optimization:** add event debouncing for high-frequency events. Add a max listener count per event with warnings.
 4. **Database query batching:** batch multiple widget data reads on dashboard load into a single SQL query.
 5. **React optimization:** add `React.memo` to widget cards, use `useMemo` for heavy computations in widgets.
@@ -1066,7 +1062,7 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 - [ ] A dashboard with 15 widgets loads in under 3 seconds.
 - [ ] Scrolling through a dashboard with off-screen widgets is smooth (60fps).
 - [ ] Memory usage remains stable (no leaks) after switching dashboards 20 times.
-- [ ] Hidden WebviewWindows do not consume CPU.
+- [ ] Unmounted web widget iframes do not consume CPU.
 
 ---
 
@@ -1148,5 +1144,5 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 - [ ] The installed app works identically to the dev build.
 - [ ] Binary size is under 15MB.
 - [ ] Cold start is under 2 seconds.
-- [ ] All widgets, event bus, WebviewWindows, hotkeys, tray, and notifications work in the production build.
+- [ ] All widgets, event bus, web widget iframes, hotkeys, tray, and notifications work in the production build.
 - [ ] The README accurately describes the project setup and widget development process.

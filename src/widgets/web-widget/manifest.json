@@ -1,0 +1,33 @@
+{
+  "id": "web-widget",
+  "name": "Web Widget",
+  "description": "Embed any website in a dashboard widget",
+  "icon": "Globe",
+  "type": "web",
+  "grid": {
+    "minW": 2,
+    "minH": 2,
+    "maxW": 12,
+    "maxH": 8,
+    "defaultW": 4,
+    "defaultH": 3
+  },
+  "permissions": [],
+  "events": {
+    "emits": [],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": []
+  },
+  "hasExpandedView": false,
+  "hasRustModule": false,
+  "settings": {
+    "url": {
+      "type": "string",
+      "label": "Website URL",
+      "default": "https://example.com"
+    }
+  }
+}
