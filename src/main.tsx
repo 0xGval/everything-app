@@ -5,6 +5,7 @@ import App from "./App";
 // Widget registrations (side-effect imports)
 import '@/widgets/daily-tasks/config';
 import '@/widgets/craving-control/config';
+import '@/widgets/voice-recorder/config';
 
 import "./index.css";
 

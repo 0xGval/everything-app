@@ -1,0 +1,45 @@
+{
+  "id": "voice-recorder",
+  "name": "Voice Recorder",
+  "description": "Record audio and transcribe with Groq Whisper API",
+  "icon": "Mic",
+  "type": "native",
+  "grid": {
+    "minW": 2,
+    "minH": 2,
+    "maxW": 4,
+    "maxH": 4,
+    "defaultW": 2,
+    "defaultH": 3
+  },
+  "permissions": ["database", "filesystem"],
+  "events": {
+    "emits": ["voice:transcription_ready"],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": ["voice:latest"]
+  },
+  "hasExpandedView": true,
+  "hasRustModule": true,
+  "settings": {
+    "groqApiKey": {
+      "type": "password",
+      "label": "Groq API Key",
+      "default": ""
+    },
+    "language": {
+      "type": "select",
+      "label": "Language",
+      "default": "en",
+      "options": [
+        { "label": "English", "value": "en" },
+        { "label": "Italiano", "value": "it" },
+        { "label": "Español", "value": "es" },
+        { "label": "Français", "value": "fr" },
+        { "label": "Deutsch", "value": "de" }
+      ]
+    }
+  }
+}

@@ -4,7 +4,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useLayoutStore } from '@/lib/store/layout-store';
 
-import { AudioTest } from './AudioTest';
 import { GridArea } from './GridArea';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -36,7 +35,6 @@ export function ShellLayout() {
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <TopBar dashboardName={activeDashboard?.name ?? 'Dashboard'} />
-          <AudioTest />
           <GridArea />
         </div>
       </div>

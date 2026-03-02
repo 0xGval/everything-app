@@ -792,32 +792,42 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ---
 
-### 3.3 — Voice Recorder Widget (Compact View)
+### 3.3 — Voice Recorder Widget (Compact View) — COMPLETE (2026-03-02)
 
 **Goal:** Build the compact view with record/stop button and last transcription preview.
 
 **Steps:**
 
-1. Create `src/widgets/voice-recorder/manifest.json` (id: `voice-recorder`, icon: `mic`, permissions: microphone/database/filesystem, hasRustModule: true).
-2. Create `VoiceRecorderCompact.tsx`:
-   - Large record button (changes to stop button while recording).
-   - Recording indicator: pulsing red dot and elapsed time counter.
-   - Last transcription preview: truncated text of the most recent transcription.
-   - Status indicator: "Ready", "Recording...", "Transcribing...", "Done".
-3. Flow:
-   - Tap record → call `invoke('start_recording')` → button turns to stop, timer starts.
-   - Tap stop → call `invoke('stop_recording')` → status changes to "Transcribing...".
-   - Transcription completes → display text preview, save to DB, emit `voice:transcription_ready`.
-4. Save recording metadata and transcription to `widget_data` via `ctx.db`.
+1. Created `src/widgets/voice-recorder/manifest.json` (id: `voice-recorder`, icon: `Mic`, grid: 2x3 default, permissions: database/filesystem, hasRustModule: true, settings: groqApiKey (password type) + language (select)).
+2. Created `VoiceRecorderCompact.tsx`:
+   - State machine: `idle` → `recording` → `transcribing` → `idle`.
+   - Large circular record button (mic icon idle, square stop icon when recording with pulsing red ring animation via `motion`).
+   - Recording timer counts up in MM:SS format.
+   - Last transcription preview at bottom (loaded from `ctx.db` on mount).
+   - Status bar: "Ready" / "Recording..." / "Transcribing..." / "Error".
+   - Auto-copy transcription to clipboard after completion.
+3. Created `VoiceRecorderExpanded.tsx` placeholder for Phase 3.4.
+4. Created `config.ts` with widget registration, added import in `main.tsx`.
+5. Groq API key management:
+   - Added `password` type to `SettingSchema` in `types.ts`.
+   - Widget settings show "API key already configured" + "Change" button when key exists.
+   - Key synced bidirectionally: widget settings ↔ Rust backend (`app_settings` table).
+6. Removed temporary `AudioTest.tsx` from ShellLayout (was from Phase 3.1/3.2).
 
 **Verification:**
-- [ ] The widget shows a record button in its default state.
-- [ ] Pressing record starts the microphone capture (verify with system audio indicators).
-- [ ] The recording timer counts up accurately.
-- [ ] Pressing stop triggers transcription and shows the "Transcribing..." state.
-- [ ] The transcribed text appears in the widget after processing.
-- [ ] The `voice:transcription_ready` event is emitted with the correct text.
-- [ ] Recording and transcription data persist across restarts.
+- [x] The widget shows a record button in its default state.
+- [x] Pressing record starts the microphone capture (verify with system audio indicators).
+- [x] The recording timer counts up accurately.
+- [x] Pressing stop triggers transcription and shows the "Transcribing..." state.
+- [x] The transcribed text appears in the widget after processing.
+- [x] The `voice:transcription_ready` event is emitted with the correct text.
+- [x] Recording and transcription data persist across restarts.
+- [x] Groq API key persists across app restarts.
+- [x] Settings dialog shows "API key already configured" when key is set.
+- [x] Transcription text auto-copied to clipboard.
+- [x] Missing API key shows inline warning message.
+
+**Known additions beyond original plan:** Password setting type for API keys, clipboard auto-copy, bidirectional API key sync between widget settings and Rust backend.
 
 ---
 

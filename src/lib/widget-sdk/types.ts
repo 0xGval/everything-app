@@ -10,7 +10,7 @@ export interface GridConstraints {
 }
 
 export interface SettingSchema {
-  type: 'string' | 'number' | 'boolean' | 'select';
+  type: 'string' | 'number' | 'boolean' | 'select' | 'password';
   label: string;
   default: unknown;
   options?: { label: string; value: string }[];

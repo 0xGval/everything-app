@@ -155,6 +155,9 @@ function SettingField({ settingKey, schema, value, onChange }: SettingFieldProps
         </div>
       );
 
+    case 'password':
+      return <PasswordField settingKey={settingKey} schema={schema} value={value} onChange={onChange} />;
+
     case 'string':
     default:
       return (
@@ -169,4 +172,44 @@ function SettingField({ settingKey, schema, value, onChange }: SettingFieldProps
         </div>
       );
   }
+}
+
+function PasswordField({ settingKey, schema, value, onChange }: SettingFieldProps) {
+  const hasValue = Boolean(value && String(value).length > 0);
+  const [editing, setEditing] = useState(!hasValue);
+
+  if (hasValue && !editing) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        <Label>{schema.label}</Label>
+        <div className="flex items-center gap-2">
+          <span className="flex-1 text-sm text-muted-foreground">API key already configured</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              onChange('');
+              setEditing(true);
+            }}
+          >
+            Change
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={settingKey}>{schema.label}</Label>
+      <Input
+        id={settingKey}
+        type="password"
+        placeholder="Paste your API key..."
+        value={String(value ?? '')}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
 }
