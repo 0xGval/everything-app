@@ -717,11 +717,13 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
    - What if both widgets are on different dashboards?
 3. Performance check: are notifications responsive?
 
+**Status:** COMPLETE (2026-03-02)
+
 **Verification:**
-- [ ] The full scenario completes without errors.
-- [ ] No event is lost or duplicated.
-- [ ] Edge cases are handled gracefully.
-- [ ] Notifications are timely and correctly formatted.
+- [x] The full scenario completes without errors.
+- [x] No event is lost or duplicated.
+- [x] Edge cases are handled gracefully.
+- [x] Notifications are timely and correctly formatted.
 
 ---
 
