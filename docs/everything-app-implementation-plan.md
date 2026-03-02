@@ -764,30 +764,31 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ---
 
-### 3.2 — Whisper Transcription Integration
+### 3.2 — Groq API Transcription — COMPLETE (2026-03-02)
 
-**Goal:** Add offline speech-to-text transcription using Whisper.
+**Goal:** Add speech-to-text transcription via Groq API (Whisper v3 large). Replaced original offline Whisper plan — no CMake/LLVM build deps, no 150MB model download, faster and better quality.
 
 **Steps:**
 
-1. Add `whisper-rs` to `Cargo.toml`.
-2. The Whisper `base` model (~75MB) is NOT bundled with the app. Instead, download it on first use:
-   - Create a Tauri command `download_whisper_model` that downloads the model to the app's data directory.
-   - On first use of the Voice Widget, check if the model exists. If not, show a download prompt with progress indicator.
-   - Store the model path in `app_settings`.
-3. Create `src-tauri/src/commands/transcription.rs`:
-   - `transcribe_audio(path: String)` → runs Whisper on the WAV file and returns the transcribed text.
-   - This is a CPU-intensive operation. Run it on a dedicated thread using `tokio::task::spawn_blocking`.
-   - Emit a Tauri event (`transcription:progress`) to allow the frontend to show progress.
-4. Create a settings option to choose between: offline Whisper, or external API (OpenAI/Groq) — implement only the offline path for now.
-5. Test with various audio samples: clear speech, noisy background, different accents.
+1. Added `reqwest 0.12` (multipart + json features) to `Cargo.toml`.
+2. Created `src-tauri/src/commands/transcription.rs` with 3 commands:
+   - `save_groq_api_key` — saves API key to `app_settings` table.
+   - `get_groq_api_key` — reads API key from `app_settings` table.
+   - `transcribe_audio(path, language)` — reads WAV file, POSTs multipart to Groq API (`whisper-large-v3`), returns transcription text. Includes punctuation prompt trick for 5 languages (en/it/es/fr/de). Emits `transcription:started` and `transcription:completed` Tauri events.
+3. Registered commands in `lib.rs` and `commands/mod.rs`.
+4. Extended `AudioTest.tsx` with: API key input + save, language selector, transcribe button, result display.
 
 **Verification:**
-- [ ] `invoke('transcribe_audio', { path })` returns transcribed text for a clear speech recording.
-- [ ] Transcription completes within a reasonable time (under 10 seconds for 30 seconds of audio with the base model).
-- [ ] The frontend receives progress events during transcription.
-- [ ] The UI remains responsive during transcription (not blocking).
-- [ ] Transcription quality is acceptable for clear English speech.
+- [x] `pnpm tauri dev` compiles without errors.
+- [x] Saving Groq API key works.
+- [x] `invoke('transcribe_audio', { path, language: 'en' })` returns transcribed text for clear English speech.
+- [x] Transcription completes within a few seconds.
+- [x] The UI remains responsive during transcription (not blocking).
+- [x] Italian transcription with language="it" produces correct text with punctuation.
+- [x] Missing API key shows appropriate error message.
+- [x] Invalid API key shows "Invalid Groq API key" error.
+
+**Known change from original plan:** Using Groq API instead of offline whisper-rs. No model download needed, just an API key.
 
 ---
 

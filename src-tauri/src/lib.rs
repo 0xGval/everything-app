@@ -39,6 +39,9 @@ pub fn run() {
             commands::audio::list_audio_devices,
             commands::audio::start_recording,
             commands::audio::stop_recording,
+            commands::transcription::transcribe_audio,
+            commands::transcription::save_groq_api_key,
+            commands::transcription::get_groq_api_key,
         ])
         .setup(|app| {
             let app_data_dir = app
