@@ -557,7 +557,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.2 — Breathing Exercise Animation
+### 2.2 — Breathing Exercise Animation — COMPLETE (2026-03-02)
 
 **Goal:** Build the guided breathing exercise that activates when the craving button is pressed.
 
@@ -579,13 +579,13 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 3. Add settings to the manifest: `breathingInhale`, `breathingHold`, `breathingExhale`, `breathingCycles`.
 
 **Verification:**
-- [ ] Pressing the craving button starts the breathing animation immediately.
-- [ ] The circle smoothly expands, holds, and contracts with correct timing.
-- [ ] Phase text updates correctly ("Breathe in", "Hold", "Breathe out").
-- [ ] Cycle counter increments correctly and stops at the configured limit.
-- [ ] "Yes" emits `craving:resisted` and returns to the default view.
-- [ ] "Not yet" offers another round.
-- [ ] Changing breathing durations in settings affects the animation timing.
+- [x] Pressing the craving button starts the breathing animation immediately.
+- [x] The circle smoothly expands, holds, and contracts with correct timing.
+- [x] Phase text updates correctly ("Breathe in", "Hold", "Breathe out").
+- [x] Cycle counter increments correctly and stops at the configured limit.
+- [x] "Yes" emits `craving:resisted` and returns to the default view.
+- [x] "Not yet" offers another round.
+- [x] Changing breathing durations in settings affects the animation timing.
 
 ---
 
