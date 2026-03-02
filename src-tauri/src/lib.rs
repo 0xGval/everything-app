@@ -29,6 +29,7 @@ pub fn run() {
             commands::widget::delete_widget_instance,
             commands::widget::save_widget_data,
             commands::widget::get_widget_data,
+            commands::widget::delete_widget_data,
             commands::widget::log_event,
             commands::widget::get_events_log,
             commands::widget::update_widget_settings,

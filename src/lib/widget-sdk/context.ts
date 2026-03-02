@@ -56,7 +56,7 @@ export function createWidgetContext(widgetInstanceId: string): WidgetContext {
       },
 
       delete: async (key) => {
-        console.log(`[widget:${widgetInstanceId}] db.delete stub`, key);
+        await invoke('delete_widget_data', { widgetInstanceId, key });
       },
     },
 

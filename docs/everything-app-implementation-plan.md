@@ -402,33 +402,34 @@ everything-app/
 
 ---
 
-### 1.12 — Daily Tasks Widget (Compact View)
+### 1.12 — Daily Tasks Widget (Compact View) — COMPLETE (2026-03-02)
 
 **Goal:** Build the first real widget — a task manager showing today's tasks in a compact grid card.
 
 **Steps:**
 
-1. Create `src/widgets/daily-tasks/manifest.json` with proper metadata (id: `daily-tasks`, name: "Daily Tasks", icon: `check-square`, grid defaults 3x3, permissions: database/notifications).
+1. Create `src/widgets/daily-tasks/manifest.json` with proper metadata (id: `daily-tasks`, name: "Daily Tasks", icon: `SquareCheckBig`, grid defaults 4x4, permissions: database/notifications).
 2. Create `DailyTasksCompact.tsx`:
    - Header: today's date and day of week.
    - Task list: each task is a row with a shadcn `Checkbox` and the task title. Completed tasks show strikethrough.
    - Quick-add: a shadcn `Input` at the bottom. Press Enter to add a task.
-   - Task count summary: "3/7 completed" in the footer.
+   - Task count summary: "X/Y" in the header.
 3. Data persistence:
-   - Use `ctx.db` to save and load tasks. Each task: `{ id, title, is_completed, due_date, created_at }`.
-   - Auto-load today's tasks on mount.
+   - Use `ctx.db` to save and load tasks. Each task: `{ id, title, isCompleted, dueDate, createdAt }`.
+   - Auto-load today's tasks on mount. Tasks filtered by today's date.
 4. Events:
    - Emit `task:created` when a new task is added.
    - Emit `task:completed` when a task is checked.
 5. Register the widget in the registry.
+6. Also implemented `db.delete` — added `delete_widget_data` Rust command (was a stub). Installed shadcn `checkbox` component.
 
 **Verification:**
-- [ ] The Daily Tasks widget appears in the catalog and can be added to a dashboard.
-- [ ] Typing a task name and pressing Enter adds it to the list.
-- [ ] Checking a task marks it as completed (strikethrough).
-- [ ] Tasks persist across app restarts.
-- [ ] The "X/Y completed" counter updates correctly.
-- [ ] `task:created` and `task:completed` events are logged in the events_log table.
+- [x] The Daily Tasks widget appears in the catalog and can be added to a dashboard.
+- [x] Typing a task name and pressing Enter adds it to the list.
+- [x] Checking a task marks it as completed (strikethrough).
+- [x] Tasks persist across app restarts.
+- [x] The "X/Y completed" counter updates correctly.
+- [x] `task:created` and `task:completed` events are logged in the events_log table.
 
 ---
 

@@ -153,6 +153,22 @@ pub async fn get_widget_data(
 }
 
 #[tauri::command]
+pub async fn delete_widget_data(
+    pool: State<'_, SqlitePool>,
+    widget_instance_id: String,
+    key: String,
+) -> Result<(), String> {
+    sqlx::query("DELETE FROM widget_data WHERE widget_instance_id = ? AND key = ?")
+        .bind(&widget_instance_id)
+        .bind(&key)
+        .execute(pool.inner())
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn log_event(
     pool: State<'_, SqlitePool>,
     event_name: String,

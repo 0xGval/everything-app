@@ -1,0 +1,25 @@
+{
+  "id": "daily-tasks",
+  "name": "Daily Tasks",
+  "description": "Track and manage your daily tasks with a simple checklist",
+  "icon": "SquareCheckBig",
+  "type": "native",
+  "grid": {
+    "minW": 3,
+    "minH": 3,
+    "defaultW": 4,
+    "defaultH": 4
+  },
+  "permissions": ["database", "notifications"],
+  "events": {
+    "emits": ["task:created", "task:completed"],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": ["tasks:today"]
+  },
+  "hasExpandedView": false,
+  "hasRustModule": false,
+  "settings": {}
+}
