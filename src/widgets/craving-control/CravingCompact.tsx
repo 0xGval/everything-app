@@ -74,8 +74,14 @@ export function CravingCompact({ ctx }: WidgetViewProps) {
       duration,
     };
 
-    await updateAndSave([...events, event]);
+    const updated = [...events, event];
+    await updateAndSave(updated);
     ctx.emit('craving:resisted', { timestamp: event.timestamp, duration });
+
+    // Motivational native notification
+    const resistedCount = updated.filter((e) => e.outcome === 'resisted').length;
+    ctx.notify('Craving Resisted!', `Great job! That's ${resistedCount} in total. Keep going!`);
+
     setView('idle');
   }, [ctx, events, startedAt, updateAndSave]);
 

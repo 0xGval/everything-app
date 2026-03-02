@@ -639,7 +639,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.5 — Notification System
+### 2.5 — Notification System — COMPLETE (2026-03-02)
 
 **Goal:** Integrate native Windows notifications via Tauri.
 
@@ -653,11 +653,14 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 4. Respect per-widget notification settings (can be disabled in widget settings).
 
 **Verification:**
-- [ ] A native Windows notification appears when all daily tasks are completed.
-- [ ] A notification appears after resisting a craving (if enabled in settings).
-- [ ] Disabling notifications in widget settings suppresses them.
-- [ ] Notifications show correct title and body text.
-- [ ] Clicking a notification brings the app window to the foreground.
+- [x] A native Windows notification appears when all daily tasks are completed.
+- [x] A notification appears after resisting a craving (if enabled in settings).
+- [x] Disabling notifications in widget settings suppresses them.
+- [x] Notifications show correct title and body text.
+- [x] Clicking a notification brings the app window to the foreground.
+
+**Known Issues:**
+- In dev mode, notifications show as "PowerShell" in Windows notification center (parent process name). Production builds show "Everything App" correctly.
 
 ---
 

@@ -127,6 +127,11 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
 
       const completed = updated.filter((t) => t.isCompleted).length;
       ctx.sharedState.write('tasks:today', { total: updated.length, completed });
+
+      // Notify when all tasks are done
+      if (updated.length > 0 && completed === updated.length) {
+        ctx.notify('All Done!', 'You completed all your tasks for today!');
+      }
     },
     [ctx, tasks, saveTasks],
   );

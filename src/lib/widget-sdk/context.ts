@@ -3,6 +3,7 @@ import type { WidgetContext } from './types';
 import { eventBus } from './event-bus';
 import { readSharedState, writeSharedState, subscribeSharedState } from '@/lib/store/shared-state';
 import { getSettingSync, getSettingsSync, setSetting } from './settings-cache';
+import { notify as sendNativeNotification } from './notifications';
 
 interface WidgetDataRow {
   id: string;
@@ -85,7 +86,7 @@ export function createWidgetContext(widgetInstanceId: string): WidgetContext {
     },
 
     notify: (title, body) => {
-      console.log(`[widget:${widgetInstanceId}] notify stub`, title, body);
+      sendNativeNotification(title, body);
     },
 
     invoke: (command, args) => {
