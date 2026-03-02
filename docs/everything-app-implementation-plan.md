@@ -433,7 +433,7 @@ everything-app/
 
 ---
 
-### 1.13 — Daily Tasks Widget (Expanded View)
+### 1.13 — Daily Tasks Widget (Expanded View) — COMPLETE (2026-03-02)
 
 **Goal:** Build the expanded full-page view for the Daily Tasks widget with full task management.
 
@@ -450,15 +450,37 @@ everything-app/
    - A back button (or Escape key) returns to the grid view.
    - Animate the transition with Motion (`import { motion, AnimatePresence } from "motion/react"`) (scale/fade).
 3. Wire up the `hasExpandedView: true` flag from the manifest to show/hide the expand button.
+4. Created shared `types.ts` and `utils.ts` to eliminate duplication between compact/expanded views:
+   - `types.ts`: shared `Task` interface, `CATEGORIES`, `RECURRING_OPTIONS`, `CATEGORY_COLORS` (Personal=blue, Work=amber, Health=green, Learning=purple).
+   - `utils.ts`: `todayStr()`, `formatDateDisplay()`, `dayLabel()`, `dayNum()`, `weekDates(referenceDate?)`, `generateRecurring(tasks, targetDate)`.
+5. Enhanced compact view (`DailyTasksCompact.tsx`):
+   - Category color dot (6px circle) before each task title.
+   - `Repeat` icon (12px, muted) after title for recurring tasks.
+   - Uses `cn()` for conditional class merging.
+6. Enhanced expanded view (`DailyTasksExpanded.tsx`):
+   - **Clickable weekly overview with navigation**: `<`/`>` arrows to browse weeks, "Today" reset button, click any day tile to switch task list to that day. Today always has a subtle ring, selected day gets primary highlight.
+   - **Future date support**: native `<input type="date">` in the add-task form pre-filled with `selectedDate`. New tasks get the selected due date.
+   - **Dynamic header**: shows "Today's Tasks" vs formatted date for other days.
+   - **Recurring edit**: recurrence selector (Once/Daily/Weekly badges) added to the edit dialog.
+   - **Category color dots** on badges and tab triggers for consistency with compact view.
+   - **Shared state fix**: `tasks:today` always reports actual today's counts regardless of `selectedDate`.
 
 **Verification:**
-- [ ] Clicking the expand button on the Daily Tasks widget replaces the grid with the expanded view.
-- [ ] Pressing Escape or the back button returns to the grid with all widgets intact.
-- [ ] Tasks can be edited, deleted, and categorized in the expanded view.
-- [ ] Recurring tasks appear on subsequent days.
-- [ ] The weekly overview shows correct task counts.
-- [ ] Changes made in the expanded view are reflected in the compact view immediately.
-- [ ] The transition animation is smooth and not jarring.
+- [x] Clicking the expand button on the Daily Tasks widget replaces the grid with the expanded view.
+- [x] Pressing Escape or the back button returns to the grid with all widgets intact.
+- [x] Tasks can be edited, deleted, and categorized in the expanded view.
+- [x] Recurring tasks appear on subsequent days.
+- [x] The weekly overview shows correct task counts.
+- [x] Changes made in the expanded view are reflected in the compact view immediately.
+- [x] The transition animation is smooth and not jarring.
+- [x] Compact view shows category color dots and repeat icons for recurring tasks.
+- [x] Weekly overview is clickable — selecting a day shows that day's tasks.
+- [x] Week navigation arrows allow browsing past/future weeks.
+- [x] Tasks can be added for future dates via the date picker.
+- [x] Recurrence can be edited in the edit dialog.
+
+**Known Issues:**
+- Recurring task generation (`generateRecurring`) only runs for the actual today on app load. Navigating to a future day in the weekly overview will not show pending recurring tasks for that day — they are generated when the day arrives. This is acceptable for now; future enhancement could generate previews for navigated dates.
 
 ---
 

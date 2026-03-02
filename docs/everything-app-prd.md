@@ -558,15 +558,27 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 
 **Purpose:** Manage and display daily tasks and events.
 
-**Compact view:** Today's date, a list of tasks with checkboxes, a quick-add input field.
+**Compact view:** Today's date, a list of tasks with checkboxes (category color dot + repeat icon for recurring), a quick-add input field, and "X/Y" completion counter.
 
-**Expanded view:** Full task management with categories, due dates, recurring tasks, and a weekly overview.
+**Expanded view:** Full task management with:
+- **Clickable weekly overview with navigation** — browse weeks with `<`/`>` arrows, "Today" reset button. Click any day tile to view/add tasks for that day. Today always has a ring, selected day gets primary highlight.
+- **Future date support** — date picker in add-task form, pre-filled with selected day. Tasks can be created for any date.
+- **Category system** — Personal (blue), Work (amber), Health (green), Learning (purple). Color dots displayed on badges, tab triggers, and compact view.
+- **Recurring tasks** — once/daily/weekly. Recurrence editable in the edit dialog. Daily/weekly tasks auto-generate on the target day when the app loads.
+- **Edit dialog** — title, category (badge selector with color dots), recurrence (Once/Daily/Weekly badges), and notes.
+- **Dynamic header** — shows "Today's Tasks" vs formatted date for other days.
+
+**Shared state:** `tasks:today` always reports actual today's counts (total + completed), regardless of which day is selected in the expanded view.
+
+**Known limitation:** Recurring task generation runs only for actual today on app load. Navigating to a future day will not preview pending recurring tasks — they generate when the day arrives.
 
 **Events emitted:** `task:created`, `task:completed`, `task:deleted`.
 
 **Events listened:** `voice:transcription_ready` (to suggest creating a task from voice input), `craving:resisted` (to auto-complete a "manage craving" recurring task).
 
-**Data stored:** Tasks with fields: id, title, description, due_date, is_completed, is_recurring, recurrence_rule, category, created_at.
+**Data stored:** Tasks with fields: id, title, isCompleted, dueDate, createdAt, category (optional), notes (optional), recurring (optional: none/daily/weekly).
+
+**Shared code:** Shared `types.ts` (Task interface, CATEGORIES, RECURRING_OPTIONS, CATEGORY_COLORS) and `utils.ts` (date helpers, recurring generation) eliminate duplication between compact/expanded views.
 
 **Permissions:** `database`, `notifications`.
 

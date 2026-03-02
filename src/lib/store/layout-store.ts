@@ -33,15 +33,23 @@ const DEFAULT_LAYOUT: LayoutItem[] = [
   { i: 'reader-1', x: 6, y: 3, w: 6, h: 3, minW: 2, minH: 2 },
 ];
 
+interface ExpandedWidget {
+  instanceId: string;
+  widgetType: string;
+}
+
 interface LayoutState {
   layout: LayoutItem[];
   widgets: WidgetInstanceMeta[];
   loaded: boolean;
   activeDashboardId: string;
+  expandedWidget: ExpandedWidget | null;
   loadLayout: (dashboardId: string) => Promise<void>;
   updateLayout: (layout: LayoutItem[]) => void;
   addWidget: (widgetType: string, gridDefaults: { w: number; h: number; minW: number; minH: number }) => Promise<void>;
   removeWidget: (widgetInstanceId: string) => Promise<void>;
+  expandWidget: (instanceId: string, widgetType: string) => void;
+  collapseWidget: () => void;
 }
 
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -74,6 +82,7 @@ export const useLayoutStore = create<LayoutState>((set) => ({
   widgets: [],
   loaded: false,
   activeDashboardId: '',
+  expandedWidget: null,
 
   loadLayout: async (dashboardId: string) => {
     // Reset state while loading
@@ -160,5 +169,13 @@ export const useLayoutStore = create<LayoutState>((set) => ({
       layout: s.layout.filter((item) => item.i !== widgetInstanceId),
       widgets: s.widgets.filter((w) => w.id !== widgetInstanceId),
     }));
+  },
+
+  expandWidget: (instanceId, widgetType) => {
+    set({ expandedWidget: { instanceId, widgetType } });
+  },
+
+  collapseWidget: () => {
+    set({ expandedWidget: null });
   },
 }));

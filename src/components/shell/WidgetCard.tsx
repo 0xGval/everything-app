@@ -32,6 +32,7 @@ export const WidgetCard = React.memo(function WidgetCard({
   const definition = getWidget(widgetType);
   const ctx = useMemo(() => createWidgetContext(widgetInstanceId), [widgetInstanceId]);
   const removeWidget = useLayoutStore((s) => s.removeWidget);
+  const expandWidget = useLayoutStore((s) => s.expandWidget);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [settingsReady, setSettingsReady] = useState(false);
@@ -65,8 +66,13 @@ export const WidgetCard = React.memo(function WidgetCard({
             <IconComponent className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           )}
           <span className="flex-1 truncate px-1 text-xs font-medium">{title}</span>
-          {definition?.manifest.hasExpandedView && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onMouseDown={(e) => e.stopPropagation()}>
+          {definition?.manifest.hasExpandedView && definition.ExpandedView && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => expandWidget(widgetInstanceId, widgetType)}
+            >
               <Maximize2 className="h-3 w-3" />
             </Button>
           )}

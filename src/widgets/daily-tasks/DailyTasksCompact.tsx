@@ -1,41 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Repeat } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import type { WidgetViewProps } from '@/lib/widget-sdk/types';
-
-interface Task {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-  dueDate: string;
-  createdAt: string;
-}
-
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function formatDate(): string {
-  return new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  });
-}
+import type { Task } from './types';
+import { CATEGORY_COLORS } from './types';
+import { todayStr, formatDateDisplay } from './utils';
 
 export function DailyTasksCompact({ ctx }: WidgetViewProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const today = todayStr();
+
   const loadTasks = useCallback(async () => {
     const stored = (await ctx.db.get('tasks')) as Task[] | undefined;
     if (stored) {
-      const today = todayStr();
       setTasks(stored.filter((t) => t.dueDate === today));
     }
-  }, [ctx]);
+  }, [ctx, today]);
 
   useEffect(() => {
     loadTasks();
@@ -45,11 +30,10 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
     async (updated: Task[]) => {
       // Load all tasks, replace today's, save back
       const allStored = ((await ctx.db.get('tasks')) as Task[] | undefined) ?? [];
-      const today = todayStr();
       const otherDays = allStored.filter((t) => t.dueDate !== today);
       await ctx.db.set('tasks', [...otherDays, ...updated]);
     },
-    [ctx],
+    [ctx, today],
   );
 
   const addTask = useCallback(async () => {
@@ -60,7 +44,7 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
       id: `task-${Date.now()}`,
       title,
       isCompleted: false,
-      dueDate: todayStr(),
+      dueDate: today,
       createdAt: new Date().toISOString(),
     };
 
@@ -73,7 +57,7 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
     // Update shared state
     const completed = updated.filter((t) => t.isCompleted).length;
     ctx.sharedState.write('tasks:today', { total: updated.length, completed });
-  }, [ctx, tasks, newTitle, saveTasks]);
+  }, [ctx, tasks, newTitle, today, saveTasks]);
 
   const toggleTask = useCallback(
     async (taskId: string) => {
@@ -99,7 +83,9 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{formatDate()}</span>
+        <span className="text-xs font-medium text-muted-foreground">
+          {formatDateDisplay(today)}
+        </span>
         <span className="text-xs text-muted-foreground">
           {completed}/{tasks.length}
         </span>
@@ -116,13 +102,25 @@ export function DailyTasksCompact({ ctx }: WidgetViewProps) {
                 checked={task.isCompleted}
                 onCheckedChange={() => toggleTask(task.id)}
               />
+              {task.category && (
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 shrink-0 rounded-full',
+                    CATEGORY_COLORS[task.category] ?? 'bg-muted-foreground',
+                  )}
+                />
+              )}
               <span
-                className={`text-sm leading-tight ${
-                  task.isCompleted ? 'line-through text-muted-foreground' : ''
-                }`}
+                className={cn(
+                  'text-sm leading-tight flex-1 min-w-0 truncate',
+                  task.isCompleted && 'line-through text-muted-foreground',
+                )}
               >
                 {task.title}
               </span>
+              {task.recurring && task.recurring !== 'none' && (
+                <Repeat className="h-3 w-3 shrink-0 text-muted-foreground" />
+              )}
             </label>
           ))}
           {tasks.length === 0 && (

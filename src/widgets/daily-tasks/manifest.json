@@ -19,7 +19,7 @@
     "reads": [],
     "writes": ["tasks:today"]
   },
-  "hasExpandedView": false,
+  "hasExpandedView": true,
   "hasRustModule": false,
   "settings": {}
 }
