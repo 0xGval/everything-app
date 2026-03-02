@@ -5,56 +5,21 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import type { WidgetViewProps } from '@/lib/widget-sdk/types';
 import { BreathingExercise } from './BreathingExercise';
-
-interface CravingEvent {
-  id: string;
-  timestamp: string;
-  outcome: 'started' | 'resisted' | 'failed';
-  duration?: number;
-  notes?: string;
-}
-
-interface CravingStats {
-  totalResisted: number;
-  dayStreak: number;
-}
+import { computeStats } from './types';
+import type { CravingEvent, CravingStats } from './types';
 
 type ViewState = 'idle' | 'breathing' | 'complete';
 
-function computeStats(events: CravingEvent[]): CravingStats {
-  const resisted = events.filter((e) => e.outcome === 'resisted');
-  const totalResisted = resisted.length;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const resistedDays = new Set(
-    resisted.map((e) => {
-      const d = new Date(e.timestamp);
-      d.setHours(0, 0, 0, 0);
-      return d.getTime();
-    }),
-  );
-
-  let dayStreak = 0;
-  const oneDay = 86_400_000;
-  let checkDate = today.getTime();
-
-  if (!resistedDays.has(checkDate)) {
-    checkDate -= oneDay;
-  }
-
-  while (resistedDays.has(checkDate)) {
-    dayStreak++;
-    checkDate -= oneDay;
-  }
-
-  return { totalResisted, dayStreak };
-}
-
 export function CravingCompact({ ctx }: WidgetViewProps) {
   const [events, setEvents] = useState<CravingEvent[]>([]);
-  const [stats, setStats] = useState<CravingStats>({ totalResisted: 0, dayStreak: 0 });
+  const [stats, setStats] = useState<CravingStats>({
+    totalResisted: 0,
+    totalFailed: 0,
+    dayStreak: 0,
+    longestStreak: 0,
+    avgResistTime: 0,
+    successRate: 0,
+  });
   const [view, setView] = useState<ViewState>('idle');
   const [startedAt, setStartedAt] = useState<string>('');
 

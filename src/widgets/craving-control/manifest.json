@@ -21,7 +21,7 @@
     "reads": [],
     "writes": ["craving:stats"]
   },
-  "hasExpandedView": false,
+  "hasExpandedView": true,
   "hasRustModule": false,
   "settings": {
     "breathingInhale": {

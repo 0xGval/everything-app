@@ -589,7 +589,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.3 — Craving Control Widget (Expanded View — Statistics)
+### 2.3 — Craving Control Widget (Expanded View — Statistics) — COMPLETE (2026-03-02)
 
 **Goal:** Build the expanded view with craving history and statistics.
 
@@ -611,11 +611,11 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
    - Notification preferences.
 
 **Verification:**
-- [ ] Expanding the craving widget shows the tabbed interface.
-- [ ] History tab lists all craving events in reverse chronological order.
-- [ ] Statistics tab shows accurate calculated metrics.
-- [ ] After resisting several cravings and failing some, the stats reflect the correct ratios.
-- [ ] Notes can be added to history entries and persist.
+- [x] Expanding the craving widget shows the tabbed interface.
+- [x] History tab lists all craving events in reverse chronological order.
+- [x] Statistics tab shows accurate calculated metrics.
+- [x] After resisting several cravings and failing some, the stats reflect the correct ratios.
+- [x] Notes can be added to history entries and persist.
 
 ---
 
