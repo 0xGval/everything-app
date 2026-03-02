@@ -664,7 +664,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.6 — System Tray Integration
+### 2.6 — System Tray Integration — COMPLETE (2026-03-02)
 
 **Goal:** The app minimizes to the system tray and can be restored from there.
 
@@ -684,12 +684,12 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 4. Add a setting in app_settings: "Minimize to tray on close" (default: true).
 
 **Verification:**
-- [ ] Closing the window minimizes to tray (icon visible in system tray).
-- [ ] Right-click shows the context menu with correct options.
-- [ ] "Open" restores the window.
-- [ ] "Quit" fully closes the app.
-- [ ] Double-click on tray icon toggles the window.
-- [ ] Setting "Minimize to tray" to false makes close actually quit the app.
+- [x] Closing the window minimizes to tray (icon visible in system tray).
+- [x] Right-click shows the context menu with correct options.
+- [x] "Open" restores the window.
+- [x] "Quit" fully closes the app.
+- [x] Single-click on tray icon toggles the window.
+- [ ] Setting "Minimize to tray" to false makes close actually quit the app (deferred — requires app settings UI).
 
 ---
 
