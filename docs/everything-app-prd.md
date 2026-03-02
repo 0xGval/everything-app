@@ -40,7 +40,7 @@ Everything App solves this by providing a single, extensible desktop environment
 - Define a Widget SDK that makes it straightforward to develop, register, and load new widgets.
 - Enable inter-widget communication through an event bus and shared state, so widgets can react to each other without tight coupling.
 - Support both native widgets (React components with optional Rust backend modules) and web widgets (embedded external websites via separate Tauri WebviewWindows).
-- Include a system tray mini-mode with global hotkeys for quick access to specific widgets without opening the full app.
+- Include a system tray icon so the app stays accessible when minimized.
 - Support multiple dashboards (e.g., "Work", "Health", "Personal") that the user can switch between.
 
 ### 3.2 Non-Goals (for v1)
@@ -133,7 +133,7 @@ The shell is the main window. It owns the top bar, sidebar, widget grid area, se
 Each widget is loaded as an isolated React component inside the grid. The runtime provides every widget with a `WidgetContext` object containing the APIs it is allowed to use. Widgets do not reference each other directly; they communicate exclusively through the runtime's event bus and shared state.
 
 **Layer 3 — Rust Backend:**
-The Tauri backend handles all system-level operations: database access, microphone capture, file I/O, notifications, and global hotkeys. Widgets access backend functionality through Tauri's `invoke` command system. Each widget can optionally declare a Rust module for custom backend logic.
+The Tauri backend handles all system-level operations: database access, microphone capture, file I/O, and notifications. Widgets access backend functionality through Tauri's `invoke` command system. Each widget can optionally declare a Rust module for custom backend logic.
 
 ### 6.2 Data Flow
 
@@ -401,19 +401,13 @@ A slide-in panel (from the right side, built with shadcn `Sheet`) that displays 
 - Web (Generic Web Widget, preconfigured widgets for Gmail, Calendar, etc.)
 - System (CPU Monitor, Quick Launcher, Clipboard History)
 
-### 8.4 System Tray and Mini-Mode
+### 8.4 System Tray
 
 The app resides in the Windows system tray when minimized. Right-clicking the tray icon provides:
 - Open app
-- Quick access to individual widgets (opens as a small standalone popup)
-- Settings
 - Quit
 
-The mini-mode allows individual widgets to be summoned via a global hotkey as floating popups without opening the full app. The user configures which widget(s) to bind to which hotkey in settings.
-
-Use cases:
-- `Ctrl+Shift+C`: Craving widget pops up → user starts breathing exercise → closes when done.
-- `Ctrl+Shift+V`: Voice widget pops up → user records and transcribes → closes automatically.
+Left-clicking the tray icon toggles the main window visibility.
 
 ### 8.5 Keyboard Shortcuts
 
@@ -423,7 +417,6 @@ Use cases:
 | `Ctrl+,` | Open settings |
 | `Ctrl+1-9` | Switch to dashboard 1-9 |
 | `Escape` | Close expanded widget / close panels |
-| `Ctrl+Shift+<key>` | Configurable global hotkeys for mini-mode |
 | `Ctrl+L` | Toggle sidebar |
 | `/` | Open command palette (future enhancement) |
 
@@ -672,8 +665,7 @@ WebView widgets embed external websites using separate Tauri `WebviewWindow` ins
 **Deliverables:**
 - **Craving Control Widget** (compact + expanded views, breathing animation, statistics).
 - Event bus integration between Craving and Daily Tasks widgets.
-- System tray integration with mini-mode.
-- Global hotkey support for mini-mode widget access.
+- System tray integration (minimize to tray, toggle visibility).
 - Notification system integration.
 
 ### Phase 3 — Voice & Web

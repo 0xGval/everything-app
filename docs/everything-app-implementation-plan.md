@@ -695,27 +695,7 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ### 2.7 — Global Hotkeys and Mini-Mode
 
-**Goal:** Allow specific widgets to be summoned as floating popups via global keyboard shortcuts.
-
-**Steps:**
-
-1. Register global shortcuts using `tauri-plugin-global-shortcut`.
-2. Create `MiniModeWindow.tsx` — a stripped-down view that renders a single widget without the shell (no sidebar, no top bar, no grid).
-3. In app settings, add a "Hotkeys" section where the user can assign a global hotkey to a specific widget type:
-   - e.g., `Ctrl+Shift+C` → Craving Control
-   - e.g., `Ctrl+Shift+T` → Daily Tasks (quick add)
-4. When the hotkey is pressed:
-   - If the mini-mode window is not open: create a small Tauri `WebviewWindow` via `WebviewWindowBuilder` (e.g., 400x300) positioned near the cursor or center screen, rendering the target widget. **Important**: the Rust command that creates this window MUST be `async` — synchronous window creation deadlocks on Windows.
-   - If the mini-mode window is already open: close it (toggle behavior).
-5. The mini-mode window is always on top and unfocused click closes it.
-
-**Verification:**
-- [ ] Pressing `Ctrl+Shift+C` (while app is minimized to tray) opens a floating craving widget.
-- [ ] The breathing exercise works correctly in mini-mode.
-- [ ] Pressing the hotkey again closes the mini-mode window.
-- [ ] The mini-mode window stays on top of other windows.
-- [ ] Clicking outside the mini-mode window closes it.
-- [ ] Hotkey assignments persist across restarts.
+**SKIPPED** — Removed on 2026-03-02. Cross-window data sync and event bridging added too much complexity for marginal value. May revisit in a future phase.
 
 ---
 
@@ -726,23 +706,21 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 **Steps:**
 
 1. Full scenario test:
-   - App starts minimized to tray.
-   - User presses `Ctrl+Shift+C` → craving mini-mode appears.
+   - User opens full app with Craving Control and Daily Tasks on dashboard.
+   - User clicks "I have a craving" → breathing exercise plays.
    - User completes breathing exercise → craving resisted.
-   - Mini-mode closes, notification appears ("Craving resisted!").
-   - User opens full app → Daily Tasks shows the health task auto-completed.
+   - Notification appears ("Craving resisted!").
+   - Daily Tasks shows the "Manage craving today" health task auto-completed.
    - User opens craving expanded view → history and stats are updated.
 2. Test edge cases:
    - What if the user spams the craving button during an exercise?
-   - What if the user closes the mini-mode mid-exercise?
    - What if both widgets are on different dashboards?
-3. Performance check: are notifications responsive? Is the mini-mode window opening fast (<300ms)?
+3. Performance check: are notifications responsive?
 
 **Verification:**
 - [ ] The full scenario completes without errors.
 - [ ] No event is lost or duplicated.
 - [ ] Edge cases are handled gracefully.
-- [ ] Mini-mode opens in under 300ms.
 - [ ] Notifications are timely and correctly formatted.
 
 ---
