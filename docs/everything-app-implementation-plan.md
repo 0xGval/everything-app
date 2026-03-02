@@ -733,7 +733,7 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ---
 
-### 3.1 — Rust Audio Capture Module
+### 3.1 — Rust Audio Capture Module — COMPLETE (2026-03-02)
 
 **Goal:** Build the Rust backend module that captures audio from the microphone and saves it as a WAV file.
 
@@ -744,16 +744,23 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
    - `list_audio_devices` → returns available input devices.
    - `start_recording` → begins capturing audio from the default (or selected) input device to a temp WAV file. Returns the file path.
    - `stop_recording` → stops capture, finalizes the WAV file, returns `{ path, duration_seconds }`.
-3. Use `tokio` for non-blocking recording (the capture runs in a background thread).
-4. Store recordings in a dedicated folder within the app data directory.
-5. Register these commands in Tauri.
+3. Use `std::thread::spawn` (not tokio) for recording — keeps cpal Stream alive on a dedicated thread, controlled by `AtomicBool`.
+4. Store recordings in `<app_data_dir>/recordings/` folder (created automatically).
+5. Register 3 commands + `RecordingState` managed state in `lib.rs`.
+
+**Implementation notes:**
+- WAV format: 16-bit PCM, device's native sample rate and channel count.
+- Handles both F32 and I16 sample formats from cpal (F32 is most common on Windows WASAPI).
+- `RecordingState = Mutex<Option<ActiveRecording>>` persists across start/stop calls.
+- cpal 0.17: `device.name()` deprecated but still functional; `sample_rate()` returns `u32` directly.
+- Temporary `AudioTest.tsx` component added to ShellLayout for verification (to be removed in Phase 3.2).
 
 **Verification:**
-- [ ] Calling `invoke('list_audio_devices')` from the frontend returns a list of input devices.
-- [ ] Calling `invoke('start_recording')` and then `invoke('stop_recording')` after 5 seconds produces a valid WAV file.
-- [ ] The WAV file plays correctly in any audio player.
-- [ ] The returned duration is approximately correct (e.g., 5 seconds ± 0.5).
-- [ ] Recording does not block the UI thread.
+- [x] Calling `invoke('list_audio_devices')` from the frontend returns a list of input devices.
+- [x] Calling `invoke('start_recording')` and then `invoke('stop_recording')` after 5 seconds produces a valid WAV file.
+- [x] The WAV file plays correctly in any audio player.
+- [x] The returned duration is approximately correct (e.g., 5 seconds ± 0.5).
+- [x] Recording does not block the UI thread.
 
 ---
 

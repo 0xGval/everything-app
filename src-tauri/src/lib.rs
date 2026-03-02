@@ -36,6 +36,9 @@ pub fn run() {
             commands::widget::get_events_log,
             commands::widget::update_widget_settings,
             commands::widget::get_widget_settings,
+            commands::audio::list_audio_devices,
+            commands::audio::start_recording,
+            commands::audio::stop_recording,
         ])
         .setup(|app| {
             let app_data_dir = app
@@ -47,6 +50,7 @@ pub fn run() {
                 .expect("database initialization failed");
 
             app.manage(pool);
+            app.manage(commands::audio::RecordingState::default());
 
             // Build system tray menu
             let open_item = MenuItem::with_id(app, "open", "Open Everything App", true, None::<&str>)?;
