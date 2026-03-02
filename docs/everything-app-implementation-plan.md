@@ -484,7 +484,7 @@ everything-app/
 
 ---
 
-### 1.14 — Phase 1 Integration Testing
+### 1.14 — Phase 1 Integration Testing — COMPLETE (2026-03-02)
 
 **Goal:** Verify that all Phase 1 components work together as a cohesive application.
 
@@ -506,12 +506,19 @@ everything-app/
 4. Performance check: is the app starting under 2 seconds? Is the grid smooth at 60fps?
 
 **Verification:**
-- [ ] Full end-to-end workflow completes without errors.
-- [ ] Multiple dashboards work independently.
-- [ ] Layout persists correctly across restarts.
-- [ ] A widget error does not crash the shell.
-- [ ] App startup is under 2 seconds.
-- [ ] Grid drag/resize is smooth (no visible lag).
+- [x] Full end-to-end workflow completes without errors.
+- [x] Multiple dashboards work independently.
+- [x] Layout persists correctly across restarts.
+- [x] A widget error does not crash the shell.
+- [x] App startup is under 2 seconds.
+- [x] Grid drag/resize is smooth (no visible lag).
+
+**Cleanup performed:**
+- Removed 5 test/placeholder widgets: `test-widget`, `event-sender`, `event-receiver`, `counter-writer`, `counter-reader`.
+- Removed widget registration imports from `main.tsx`.
+- Updated `DEFAULT_WIDGETS` and `DEFAULT_LAYOUT` in `layout-store.ts` to empty arrays (first launch shows clean empty grid).
+- Widget catalog now only shows `daily-tasks`.
+- Frontend build compiles cleanly with no errors.
 
 ---
 
