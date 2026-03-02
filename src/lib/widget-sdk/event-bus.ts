@@ -7,6 +7,7 @@ class EventBus {
   private listeners = new Map<string, Set<EventCallback>>();
 
   emit(event: string, payload?: unknown, sourceWidgetId?: string): void {
+    console.log(`[event-bus] ${event}`, payload ?? '', sourceWidgetId ? `from:${sourceWidgetId}` : '');
     const callbacks = this.listeners.get(event);
     if (callbacks) {
       for (const cb of callbacks) {

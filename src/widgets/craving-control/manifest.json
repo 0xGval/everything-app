@@ -1,0 +1,48 @@
+{
+  "id": "craving-control",
+  "name": "Craving Control",
+  "description": "Breathing exercises and tracking to manage cravings",
+  "icon": "Wind",
+  "type": "native",
+  "grid": {
+    "minW": 2,
+    "minH": 2,
+    "maxW": 4,
+    "maxH": 4,
+    "defaultW": 2,
+    "defaultH": 2
+  },
+  "permissions": ["database", "notifications"],
+  "events": {
+    "emits": ["craving:started", "craving:resisted", "craving:failed"],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": ["craving:stats"]
+  },
+  "hasExpandedView": false,
+  "hasRustModule": false,
+  "settings": {
+    "breathingInhale": {
+      "type": "number",
+      "label": "Inhale duration (seconds)",
+      "default": 4
+    },
+    "breathingHold": {
+      "type": "number",
+      "label": "Hold duration (seconds)",
+      "default": 4
+    },
+    "breathingExhale": {
+      "type": "number",
+      "label": "Exhale duration (seconds)",
+      "default": 6
+    },
+    "breathingCycles": {
+      "type": "number",
+      "label": "Number of breathing cycles",
+      "default": 5
+    }
+  }
+}

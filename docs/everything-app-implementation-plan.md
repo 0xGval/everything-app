@@ -528,28 +528,32 @@ Phase 2 adds the Craving Control widget, system tray integration, global hotkeys
 
 ---
 
-### 2.1 — Craving Control Widget (Compact View — Core)
+### 2.1 — Craving Control Widget (Compact View — Core) — COMPLETE (2026-03-02)
 
 **Goal:** Build the compact view with the "I have a craving" button and streak counter.
 
 **Steps:**
 
-1. Create `src/widgets/craving-control/manifest.json` (id: `craving-control`, icon: `wind`, grid default 2x2, permissions: database/notifications).
+1. Create `src/widgets/craving-control/manifest.json` (id: `craving-control`, icon: `Wind`, grid default 2x2, max 4x4, permissions: database/notifications, settings for breathing exercise timing).
 2. Create `CravingCompact.tsx`:
-   - Large, prominent "I have a craving" button (shadcn `Button`, size `lg`, full width).
-   - Streak display: "X cravings resisted" and "Y day streak" below the button.
+   - Large, prominent "I have a craving" button (shadcn `Button`, size `lg`, full width, destructive variant).
+   - Streak display: "X cravings resisted" and "Y day streak" below the button with icons.
    - Load streak data from `ctx.db` on mount.
+   - `computeStats()` calculates totalResisted + consecutive day streak from craving events.
+   - Writes `craving:stats` to shared state on load.
 3. On button press:
    - Emit `craving:started` event.
-   - Log the craving event to the database with timestamp.
+   - Log the craving event to the database with timestamp and `outcome: 'started'`.
    - Transition to the breathing exercise UI (within the same compact card — see next phase).
 4. For now, the button just logs the event and increments the counter. The breathing exercise is Phase 2.2.
+5. Create `config.ts` — registers widget with manifest + CompactView.
+6. Register import in `main.tsx`.
 
 **Verification:**
-- [ ] The Craving Control widget appears in the catalog and can be added.
-- [ ] Pressing the button logs a craving event and emits `craving:started`.
-- [ ] The streak counter updates after each press.
-- [ ] Streak data persists across restarts.
+- [x] The Craving Control widget appears in the catalog and can be added.
+- [x] Pressing the button logs a craving event and emits `craving:started`.
+- [x] The streak counter updates after each press.
+- [x] Streak data persists across restarts.
 
 ---
 

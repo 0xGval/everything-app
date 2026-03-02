@@ -4,6 +4,7 @@ import App from "./App";
 
 // Widget registrations (side-effect imports)
 import '@/widgets/daily-tasks/config';
+import '@/widgets/craving-control/config';
 
 import "./index.css";
 
