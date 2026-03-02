@@ -39,6 +39,8 @@ pub fn run() {
             commands::audio::list_audio_devices,
             commands::audio::start_recording,
             commands::audio::stop_recording,
+            commands::audio::read_audio_base64,
+            commands::audio::delete_recording_file,
             commands::transcription::transcribe_audio,
             commands::transcription::save_groq_api_key,
             commands::transcription::get_groq_api_key,

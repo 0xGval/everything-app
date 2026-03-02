@@ -831,26 +831,37 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Whisper transcripti
 
 ---
 
-### 3.4 — Voice Recorder Widget (Expanded View)
+### 3.4 — Voice Recorder Widget (Expanded View) — COMPLETE (2026-03-02)
 
 **Goal:** Full recording management with playback, editing, and export.
 
 **Steps:**
 
-1. Create `VoiceRecorderExpanded.tsx`:
-   - **Recordings list:** scrollable list of all recordings with: date/time, duration, transcription preview, and playback button.
-   - **Audio playback:** clicking play on a recording plays the audio (use HTML5 `<audio>` element with the local file path).
-   - **Transcription editing:** click on the transcription text to edit it inline.
-   - **Delete recording:** remove audio file and database entry.
-   - **Search:** filter recordings by transcription text.
-2. Add keyboard shortcut hint: show a subtle label "Ctrl+Shift+V for quick record" in the widget.
+1. Created `src/widgets/voice-recorder/types.ts` — shared types (`VoiceRecording`, `RecordingResult`, `TranscriptionResult`) and utilities (`formatDuration`, `formatDate`, `formatTime`) extracted from compact view to eliminate duplication.
+2. Created full `VoiceRecorderExpanded.tsx`:
+   - **Recordings list:** scrollable list (newest first) of all recordings with date/time, duration badge, transcription text, and action buttons.
+   - **Audio playback:** play/pause toggle per recording. Uses Rust `read_audio_base64` command → data URL → HTML5 `Audio`. Only one recording plays at a time.
+   - **Transcription editing:** click pencil icon (hover-reveal) → inline textarea with save/cancel buttons. Changes persisted to SQLite.
+   - **Delete recording:** 2-step confirmation (click trash → Confirm/Cancel). Deletes both WAV file (via Rust `delete_recording_file` command) and database entry.
+   - **Retry transcription:** for recordings with empty transcription, shows warning icon + "Retry" button that calls Groq API.
+   - **Search:** real-time filter by transcription text content. Recording count updates dynamically.
+   - **Copy to clipboard:** per-recording copy button for transcription text.
+   - **Empty state:** dedicated message for no recordings vs no search results.
+3. Added Rust commands in `audio.rs`:
+   - `read_audio_base64(path)` — reads WAV file and returns base64-encoded string (avoids `@tauri-apps/plugin-fs` scope issues with absolute paths on Windows).
+   - `delete_recording_file(path)` — removes WAV file from disk.
+4. Added `base64 = "0.22"` to `Cargo.toml`.
+5. Applied 3x mic gain to F32 recording path for louder capture on Windows.
+6. Updated `VoiceRecorderCompact.tsx` to import shared types from `types.ts`.
 
 **Verification:**
-- [ ] Expanded view lists all past recordings chronologically.
-- [ ] Clicking play plays the audio correctly.
-- [ ] Transcription text can be edited and saved.
-- [ ] Recordings can be deleted (both DB entry and audio file).
-- [ ] Search filters recordings by transcription content.
+- [x] Expanded view lists all past recordings chronologically.
+- [x] Clicking play plays the audio correctly.
+- [x] Transcription text can be edited and saved.
+- [x] Recordings can be deleted (both DB entry and audio file).
+- [x] Search filters recordings by transcription content.
+
+**Known additions beyond original plan:** Retry transcription for failed recordings, 2-step delete confirmation, per-recording clipboard copy, mic gain boost (3x), shared types.ts to reduce duplication between compact/expanded views.
 
 ---
 

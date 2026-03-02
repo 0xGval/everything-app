@@ -6,31 +6,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { WidgetViewProps } from '@/lib/widget-sdk/types';
 import { onSettingsChange, getSettingSync } from '@/lib/widget-sdk/settings-cache';
+import { formatDuration } from './types';
+import type { VoiceRecording, RecordingResult, TranscriptionResult } from './types';
 
 type RecordingState = 'idle' | 'recording' | 'transcribing';
-
-interface VoiceRecording {
-  id: string;
-  timestamp: number;
-  duration: number;
-  path: string;
-  transcription: string;
-}
-
-interface RecordingResult {
-  path: string;
-  duration_seconds: number;
-}
-
-interface TranscriptionResult {
-  text: string;
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
 
 export function VoiceRecorderCompact({ ctx }: WidgetViewProps) {
   const [state, setState] = useState<RecordingState>('idle');
@@ -267,7 +246,7 @@ export function VoiceRecorderCompact({ ctx }: WidgetViewProps) {
             animate={{ opacity: 1, y: 0 }}
             className="text-sm font-mono tabular-nums text-muted-foreground"
           >
-            {formatTime(elapsed)}
+            {formatDuration(elapsed)}
           </motion.span>
         )}
       </div>

@@ -132,11 +132,12 @@ pub async fn start_recording(
                 device.build_input_stream(
                     &config.into(),
                     move |data: &[f32], _: &cpal::InputCallbackInfo| {
+                        const MIC_GAIN: f32 = 3.0;
                         if let Ok(mut guard) = writer_for_callback.lock() {
                             if let Some(ref mut w) = *guard {
                                 for &sample in data {
-                                    let clamped = sample.clamp(-1.0, 1.0);
-                                    let int_sample = (clamped * i16::MAX as f32) as i16;
+                                    let amplified = (sample * MIC_GAIN).clamp(-1.0, 1.0);
+                                    let int_sample = (amplified * i16::MAX as f32) as i16;
                                     let _ = w.write_sample(int_sample);
                                 }
                             }
@@ -207,6 +208,24 @@ pub async fn start_recording(
     });
 
     Ok(file_path_str)
+}
+
+#[tauri::command]
+pub async fn read_audio_base64(path: String) -> Result<String, String> {
+    use base64::Engine;
+    let bytes =
+        std::fs::read(&path).map_err(|e| format!("Failed to read audio file: {}", e))?;
+    Ok(base64::engine::general_purpose::STANDARD.encode(&bytes))
+}
+
+#[tauri::command]
+pub async fn delete_recording_file(path: String) -> Result<(), String> {
+    let file = std::path::Path::new(&path);
+    if file.exists() {
+        std::fs::remove_file(file)
+            .map_err(|e| format!("Failed to delete recording file: {}", e))?;
+    }
+    Ok(())
 }
 
 #[tauri::command]
