@@ -7,6 +7,7 @@ import {
 } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { LazyWidget } from './LazyWidget';
 import { WidgetCard } from './WidgetCard';
 import { useLayoutStore } from '@/lib/store/layout-store';
 
@@ -82,7 +83,9 @@ export function WidgetGrid() {
         >
           {widgets.map((widget) => (
             <div key={widget.id}>
-              <WidgetCard widgetInstanceId={widget.id} widgetType={widget.widgetType} />
+              <LazyWidget>
+                <WidgetCard widgetInstanceId={widget.id} widgetType={widget.widgetType} />
+              </LazyWidget>
             </div>
           ))}
         </ResponsiveGridLayout>
