@@ -1110,43 +1110,19 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 ---
 
-### 4.6 — Backup and Export
+### 4.6 — Backup and Export — DEFERRED
+
+**Status:** Deferred to a future iteration. Not blocking for daily use.
 
 **Goal:** Allow the user to export and import their entire app configuration and data.
 
-**Steps:**
-
-1. Create an "Export" option in app settings:
-   - Packages the SQLite database + app settings into a single `.zip` file.
-   - User chooses the save location via a native file picker.
-2. Create an "Import" option:
-   - Reads a `.zip` export file.
-   - Replaces the current database (with confirmation).
-   - Reloads the app to reflect imported data.
-3. Add an "Auto-backup" option: save a backup to a configured directory on app quit (daily).
-
-**Verification:**
-- [ ] Export creates a valid `.zip` file containing the database.
-- [ ] Import restores dashboards, widgets, tasks, craving history, and settings correctly.
-- [ ] Import warns before overwriting existing data.
-- [ ] Auto-backup creates a timestamped backup file on app quit.
-
 ---
 
-### 4.7 — App Autostart
+### 4.7 — App Autostart — DEFERRED
+
+**Status:** Deferred to a future iteration. Not blocking for daily use.
 
 **Goal:** Optionally launch Everything App on Windows startup.
-
-**Steps:**
-
-1. Add a setting: "Start with Windows" (default: false).
-2. Use `tauri-plugin-autostart` to register/unregister the app from Windows startup.
-3. When starting at boot, start minimized to tray (don't open the window).
-
-**Verification:**
-- [ ] Enabling the setting adds the app to Windows startup.
-- [ ] After reboot, the app is running in the system tray.
-- [ ] Disabling the setting removes it from startup.
 
 ---
 
