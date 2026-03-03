@@ -41,6 +41,8 @@ export function WidgetGrid() {
     return () => observer.disconnect();
   }, []);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   const layouts = useMemo<ResponsiveLayouts>(() => ({ lg: layout }), [layout]);
 
   const onLayoutChange = useCallback(
@@ -51,8 +53,16 @@ export function WidgetGrid() {
     [loaded, updateLayout],
   );
 
+  const handleDragResizeStart = useCallback(() => {
+    setIsDragging(true);
+  }, []);
+
+  const handleDragResizeStop = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   return (
-    <div ref={containerRef} className="flex-1 overflow-auto p-2">
+    <div ref={containerRef} className={`flex-1 overflow-auto p-2${isDragging ? ' grid-dragging' : ''}`}>
       {containerWidth > 0 && loaded && (
         <ResponsiveGridLayout
           layouts={layouts}
@@ -64,6 +74,10 @@ export function WidgetGrid() {
           resizeConfig={RESIZE_CONFIG}
           compactor={verticalCompactor}
           onLayoutChange={onLayoutChange}
+          onDragStart={handleDragResizeStart}
+          onDragStop={handleDragResizeStop}
+          onResizeStart={handleDragResizeStart}
+          onResizeStop={handleDragResizeStop}
           margin={[8, 8] as const}
         >
           {widgets.map((widget) => (

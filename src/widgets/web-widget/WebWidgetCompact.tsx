@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ExternalLink, Loader2, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AlertTriangle, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,16 @@ import type { WidgetViewProps } from '@/lib/widget-sdk/types';
 import { onSettingsChange } from '@/lib/widget-sdk/settings-cache';
 import { normalizeUrl } from './utils';
 
+const LOAD_TIMEOUT_MS = 8000;
+
 export function WebWidgetCompact({ ctx }: WidgetViewProps) {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [url, setUrl] = useState(() => {
     return normalizeUrl((ctx.settings.get('url') as string) ?? '');
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Listen for settings changes (user changes URL)
   useEffect(() => {
@@ -20,11 +24,32 @@ export function WebWidgetCompact({ ctx }: WidgetViewProps) {
       const newUrl = normalizeUrl((ctx.settings.get('url') as string) ?? '');
       setUrl(newUrl);
       setLoading(true);
+      setError(false);
     });
   }, [ctx]);
 
+  // Timeout: if iframe doesn't fire onLoad within LOAD_TIMEOUT_MS, assume blocked
+  useEffect(() => {
+    if (!loading) return;
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setError(true);
+      }
+    }, LOAD_TIMEOUT_MS);
+    return () => clearTimeout(timeoutRef.current);
+  }, [loading, url, refreshKey]);
+
+  const handleLoad = useCallback(() => {
+    clearTimeout(timeoutRef.current);
+    setLoading(false);
+    setError(false);
+  }, []);
+
   const handleRefresh = useCallback(() => {
     setLoading(true);
+    setError(false);
     setRefreshKey((k) => k + 1);
   }, []);
 
@@ -65,13 +90,26 @@ export function WebWidgetCompact({ ctx }: WidgetViewProps) {
           </div>
         )}
 
+        {error && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-card p-4">
+            <AlertTriangle className="h-8 w-8 text-muted-foreground" />
+            <p className="text-center text-xs text-muted-foreground">
+              This site may block embedding.
+            </p>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={handleOpenInBrowser}>
+              <ExternalLink className="mr-1.5 h-3 w-3" />
+              Open in browser
+            </Button>
+          </div>
+        )}
+
         <iframe
           key={`${url}-${refreshKey}`}
           src={url}
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
           referrerPolicy="no-referrer"
           className="h-full w-full border-0"
-          onLoad={() => setLoading(false)}
+          onLoad={handleLoad}
         />
       </div>
     </div>

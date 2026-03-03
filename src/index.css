@@ -125,3 +125,8 @@
     @apply bg-background text-foreground;
     }
 }
+
+/* Prevent iframes from capturing mouse events during grid drag/resize */
+.grid-dragging iframe {
+  pointer-events: none;
+}

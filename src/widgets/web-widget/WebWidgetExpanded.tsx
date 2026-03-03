@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ExternalLink, Loader2, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AlertTriangle, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { Button } from '@/components/ui/button';
@@ -7,23 +7,47 @@ import type { WidgetViewProps } from '@/lib/widget-sdk/types';
 import { onSettingsChange } from '@/lib/widget-sdk/settings-cache';
 import { normalizeUrl } from './utils';
 
+const LOAD_TIMEOUT_MS = 8000;
+
 export function WebWidgetExpanded({ ctx }: WidgetViewProps) {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [url, setUrl] = useState(() => {
     return normalizeUrl((ctx.settings.get('url') as string) ?? '');
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     return onSettingsChange(ctx.widgetId, () => {
       const newUrl = normalizeUrl((ctx.settings.get('url') as string) ?? '');
       setUrl(newUrl);
       setLoading(true);
+      setError(false);
     });
   }, [ctx]);
 
+  useEffect(() => {
+    if (!loading) return;
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setError(true);
+      }
+    }, LOAD_TIMEOUT_MS);
+    return () => clearTimeout(timeoutRef.current);
+  }, [loading, url, refreshKey]);
+
+  const handleLoad = useCallback(() => {
+    clearTimeout(timeoutRef.current);
+    setLoading(false);
+    setError(false);
+  }, []);
+
   const handleRefresh = useCallback(() => {
     setLoading(true);
+    setError(false);
     setRefreshKey((k) => k + 1);
   }, []);
 
@@ -64,13 +88,26 @@ export function WebWidgetExpanded({ ctx }: WidgetViewProps) {
           </div>
         )}
 
+        {error && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-card p-6">
+            <AlertTriangle className="h-10 w-10 text-muted-foreground" />
+            <p className="text-center text-sm text-muted-foreground">
+              This site may block iframe embedding.
+            </p>
+            <Button variant="outline" size="sm" onClick={handleOpenInBrowser}>
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Open in browser
+            </Button>
+          </div>
+        )}
+
         <iframe
           key={`${url}-${refreshKey}`}
           src={url}
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
           referrerPolicy="no-referrer"
           className="h-full w-full border-0"
-          onLoad={() => setLoading(false)}
+          onLoad={handleLoad}
         />
       </div>
     </div>

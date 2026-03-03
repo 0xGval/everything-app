@@ -931,24 +931,25 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Groq transcription)
 
 ---
 
-### 3.8 — Web Widget Error Handling
+### 3.8 — Web Widget Error Handling — COMPLETE (2026-03-03)
 
 **Goal:** Detect and handle sites that block iframe embedding.
 
 **Steps:**
 
-1. Implement iframe load detection:
-   - `onLoad` event on the iframe to detect successful load.
-   - Timeout fallback (5s): if no `onLoad` fires, assume the site may have blocked embedding.
-   - Show an error state with the URL and an "Open in browser" button.
-2. Add a `pointer-events: none` overlay during grid drag operations to prevent the iframe from capturing mouse events.
-3. Test with various sites: Wikipedia (works), Google (blocked), GitHub docs (works), etc.
+1. Implemented iframe load timeout detection (8s) in both `WebWidgetCompact.tsx` and `WebWidgetExpanded.tsx`:
+   - `onLoad` event clears timeout and marks success.
+   - If no `onLoad` fires within 8 seconds, shows error state with warning icon, message ("This site may block embedding"), and "Open in browser" button.
+   - Refresh and URL change reset the error state.
+2. Added `.grid-dragging iframe { pointer-events: none }` CSS rule in `index.css`.
+3. Added `isDragging` state to `WidgetGrid.tsx` — toggled by `onDragStart`/`onDragStop` and `onResizeStart`/`onResizeStop` callbacks — applies `grid-dragging` class to container.
+4. Tested: Wikipedia (works), Google (blocked → error state shown).
 
 **Verification:**
-- [ ] Sites that allow iframes load and display correctly.
-- [ ] Sites that block iframes show an error state with "Open in browser" option.
-- [ ] Dragging the widget card works smoothly (iframe doesn't steal mouse events).
-- [ ] No console errors or unhandled promise rejections.
+- [x] Sites that allow iframes load and display correctly.
+- [x] Sites that block iframes show an error state with "Open in browser" option.
+- [x] Dragging the widget card works smoothly (iframe doesn't steal mouse events).
+- [x] No console errors or unhandled promise rejections.
 
 ---
 
