@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { ArrowLeft, icons, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
+import { WidgetErrorBoundary } from './WidgetErrorBoundary';
 import { WidgetGrid } from './WidgetGrid';
 import { useLayoutStore } from '@/lib/store/layout-store';
 import { getWidget } from '@/lib/widget-sdk/registry';
@@ -59,7 +60,12 @@ export function GridArea() {
               <span className="text-sm font-medium">{definition.manifest.name}</span>
             </div>
             <div className="flex-1 overflow-auto p-4">
-              <definition.ExpandedView ctx={ctx} />
+              <WidgetErrorBoundary
+                widgetName={definition.manifest.name}
+                onRemove={collapseWidget}
+              >
+                <definition.ExpandedView ctx={ctx} />
+              </WidgetErrorBoundary>
             </div>
           </motion.div>
         ) : (

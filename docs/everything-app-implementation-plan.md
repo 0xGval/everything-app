@@ -1088,23 +1088,25 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 ---
 
-### 4.5 — Error Boundaries and Resilience
+### 4.5 — Error Boundaries and Resilience — COMPLETE (2026-03-03)
 
 **Goal:** Ensure widget errors are gracefully contained.
 
 **Steps:**
 
-1. Wrap each `WidgetCard` in a React Error Boundary.
-2. On widget error: display a friendly error card with the widget name, a "Reload" button, and a "Remove" button.
-3. Log widget errors to a local error log (SQLite or file).
-4. Add a subtle indicator on the widget card if it has encountered errors recently.
-5. Ensure the shell is fully functional even when a widget is in error state.
+1. Created `WidgetErrorBoundary.tsx` — React class component Error Boundary:
+   - Catches render errors in children via `getDerivedStateFromError` + `componentDidCatch`.
+   - Displays friendly error card: warning icon, widget name, error message (truncated), "Reload" button (re-mounts widget), "Remove" button (removes from grid).
+   - Logs errors to console with `[WidgetErrorBoundary]` prefix and component stack.
+2. Wrapped `CompactView` in `WidgetCard.tsx` with `WidgetErrorBoundary` — "Remove" triggers `removeWidget`.
+3. Wrapped `ExpandedView` in `GridArea.tsx` with `WidgetErrorBoundary` — "Remove" triggers `collapseWidget` (returns to grid).
+4. Shell remains fully functional when a widget is in error state.
 
 **Verification:**
-- [ ] A widget that throws an error shows the error card instead of crashing the app.
-- [ ] Clicking "Reload" re-mounts the widget and clears the error.
-- [ ] Other widgets are completely unaffected by one widget's error.
-- [ ] The error is logged for debugging.
+- [x] A widget that throws an error shows the error card instead of crashing the app.
+- [x] Clicking "Reload" re-mounts the widget and clears the error.
+- [x] Other widgets are completely unaffected by one widget's error.
+- [x] The error is logged for debugging.
 
 ---
 

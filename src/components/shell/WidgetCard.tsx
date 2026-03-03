@@ -16,6 +16,7 @@ import { getWidget } from '@/lib/widget-sdk/registry';
 import { createWidgetContext } from '@/lib/widget-sdk/context';
 import { loadSettings, onSettingsChange } from '@/lib/widget-sdk/settings-cache';
 import { useLayoutStore } from '@/lib/store/layout-store';
+import { WidgetErrorBoundary } from './WidgetErrorBoundary';
 import { WidgetSettingsDialog } from './WidgetSettingsDialog';
 
 const iconsRecord = icons as Record<string, LucideIcon>;
@@ -95,7 +96,12 @@ export const WidgetCard = React.memo(function WidgetCard({
         </div>
         <CardContent className="flex-1 overflow-auto p-3">
           {definition && settingsReady ? (
-            <definition.CompactView ctx={ctx} />
+            <WidgetErrorBoundary
+              widgetName={title}
+              onRemove={() => removeWidget(widgetInstanceId)}
+            >
+              <definition.CompactView ctx={ctx} />
+            </WidgetErrorBoundary>
           ) : definition ? (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
               Loading...
