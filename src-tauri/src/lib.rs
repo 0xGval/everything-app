@@ -44,6 +44,8 @@ pub fn run() {
             commands::transcription::transcribe_audio,
             commands::transcription::save_groq_api_key,
             commands::transcription::get_groq_api_key,
+            commands::widget::get_app_setting,
+            commands::widget::save_app_setting,
         ])
         .setup(|app| {
             let app_data_dir = app

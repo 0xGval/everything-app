@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
+import { AppSettingsDialog } from './AppSettingsDialog';
 import { DashboardDialog } from './DashboardDialog';
 
 const iconsRecord = icons as Record<string, LucideIcon>;
@@ -34,6 +35,7 @@ export function Sidebar() {
   const renameDashboard = useDashboardStore((s) => s.rename);
   const removeDashboard = useDashboardStore((s) => s.remove);
 
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -116,6 +118,7 @@ export function Sidebar() {
                 variant="ghost"
                 size="icon"
                 className="text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                onClick={() => setSettingsOpen(true)}
               >
                 <SettingsIcon className="h-5 w-5" />
               </Button>
@@ -185,6 +188,8 @@ export function Sidebar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AppSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   );
 }

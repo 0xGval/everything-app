@@ -246,3 +246,42 @@ pub async fn get_events_log(
     .await
     .map_err(|e| e.to_string())
 }
+
+// ── App Settings (generic key-value) ───────────────────────────────────────
+
+#[derive(Debug, Serialize, FromRow)]
+pub struct AppSetting {
+    pub key: String,
+    pub value: String,
+}
+
+#[tauri::command]
+pub async fn get_app_setting(
+    pool: State<'_, SqlitePool>,
+    key: String,
+) -> Result<Option<AppSetting>, String> {
+    sqlx::query_as::<_, AppSetting>("SELECT key, value FROM app_settings WHERE key = ?")
+        .bind(&key)
+        .fetch_optional(pool.inner())
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn save_app_setting(
+    pool: State<'_, SqlitePool>,
+    key: String,
+    value: String,
+) -> Result<(), String> {
+    sqlx::query(
+        "INSERT INTO app_settings (key, value) VALUES (?, ?)
+         ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+    )
+    .bind(&key)
+    .bind(&value)
+    .execute(pool.inner())
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}

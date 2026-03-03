@@ -1010,23 +1010,33 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 ---
 
-### 4.2 — Keyboard Shortcut Customization
+### 4.2 — Keyboard Shortcut Customization — COMPLETE (2026-03-03)
 
 **Goal:** Allow users to customize all keyboard shortcuts.
 
 **Steps:**
 
-1. Create a "Shortcuts" tab in app settings.
-2. List all available shortcuts with their current binding.
-3. Allow rebinding: click on a shortcut → press new key combination → save.
-4. Validate for conflicts (no two actions on the same shortcut).
-5. Persist custom shortcuts in `app_settings` SQLite table.
+1. Added generic `get_app_setting` and `save_app_setting` Rust commands for the `app_settings` table (reusable key-value store).
+2. Created `shortcuts-store.ts` (zustand):
+   - 15 default shortcuts (General: command palette, add widget, settings, toggle sidebar, close panel; Dashboards: Ctrl+1-9).
+   - `load()` reads custom bindings from SQLite `app_settings` table (`keyboard_shortcuts` key).
+   - `rebind(id, binding)`, `reset(id)`, `resetAll()` — all persist to SQLite.
+   - `matchesBinding(event, binding)` utility for matching keyboard events to binding strings.
+3. Created `AppSettingsDialog.tsx` — "Keyboard Shortcuts" dialog opened from sidebar settings icon:
+   - Grouped by category (General, Dashboards).
+   - Click a binding → "Press keys..." recording mode → press key combo → saves.
+   - Escape cancels recording without changing.
+   - Conflict detection: if binding already used, shows red warning and rejects.
+   - Per-shortcut reset button (appears when modified). "Reset All to Defaults" button.
+4. Wired sidebar settings gear icon to open `AppSettingsDialog`.
+5. Updated `CommandPalette.tsx` to read bindings from shortcuts store instead of hardcoded keys.
+6. Shortcuts store loaded at app startup in `ShellLayout.tsx`.
 
 **Verification:**
-- [ ] All shortcuts are listed with current bindings.
-- [ ] Rebinding works and takes effect immediately.
-- [ ] Conflicts are detected and warned.
-- [ ] Custom bindings persist across restarts.
+- [x] All shortcuts are listed with current bindings.
+- [x] Rebinding works and takes effect immediately.
+- [x] Conflicts are detected and warned.
+- [x] Custom bindings persist across restarts.
 
 ---
 
