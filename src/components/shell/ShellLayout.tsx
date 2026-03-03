@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useLayoutStore } from '@/lib/store/layout-store';
 
+import { CommandPalette } from './CommandPalette';
 import { GridArea } from './GridArea';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -38,6 +39,7 @@ export function ShellLayout() {
           <GridArea />
         </div>
       </div>
+      <CommandPalette />
     </TooltipProvider>
   );
 }

@@ -986,25 +986,27 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 ---
 
-### 4.1 — Command Palette
+### 4.1 — Command Palette — COMPLETE (2026-03-03)
 
 **Goal:** Implement a `/` key command palette for quick actions.
 
 **Steps:**
 
-1. Add the shadcn `Command` component (based on cmdk).
-2. Create `CommandPalette.tsx`:
-   - Opens on `/` key press (when no input is focused) or `Ctrl+K`.
-   - Searchable list of actions: switch dashboard, add widget, open settings, expand a specific widget, toggle theme.
-   - Each action has an icon and keyboard shortcut hint.
-3. Wire actions to the corresponding functions.
+1. Added shadcn `Command` component (cmdk-based) via `pnpm dlx shadcn@latest add command`.
+2. Created `CommandPalette.tsx` in `src/components/shell/`:
+   - Opens on `/` key press (when no input/textarea is focused) or `Ctrl+K` (toggle).
+   - Grouped actions: Dashboards (switch), Add Widget (all registered widgets), Open Widget (expandable widgets on grid), Appearance (toggle theme).
+   - Each action has a Lucide icon. Dashboard actions show `Ctrl+1-9` shortcut hints.
+   - `/` skipped when input, textarea, or contentEditable is focused.
+3. Wired all actions: `setActiveDashboard`, `addWidget`, `expandWidget`, and dark/light theme toggle via `classList.toggle('dark')`.
+4. Added `<CommandPalette />` to `ShellLayout.tsx`.
 
 **Verification:**
-- [ ] Pressing `/` opens the command palette.
-- [ ] Typing filters actions in real time.
-- [ ] Selecting "Switch to Work dashboard" switches correctly.
-- [ ] Selecting "Add Daily Tasks" adds the widget.
-- [ ] Escape closes the palette.
+- [x] Pressing `/` opens the command palette.
+- [x] Typing filters actions in real time.
+- [x] Selecting "Switch to Work dashboard" switches correctly.
+- [x] Selecting "Add Daily Tasks" adds the widget.
+- [x] Escape closes the palette.
 
 ---
 
