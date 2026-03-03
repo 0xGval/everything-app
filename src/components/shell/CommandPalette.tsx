@@ -4,6 +4,7 @@ import {
   Moon,
   Plus,
   Sun,
+  SunMoon,
   icons,
   type LucideIcon,
 } from 'lucide-react';
@@ -20,6 +21,7 @@ import {
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useLayoutStore } from '@/lib/store/layout-store';
 import { useShortcutsStore, matchesBinding } from '@/lib/store/shortcuts-store';
+import { useThemeStore } from '@/lib/store/theme-store';
 import { getAllWidgets } from '@/lib/widget-sdk/registry';
 
 const iconsRecord = icons as Record<string, LucideIcon>;
@@ -40,6 +42,7 @@ export function CommandPalette() {
   const widgets = useLayoutStore((s) => s.widgets);
   const expandWidget = useLayoutStore((s) => s.expandWidget);
   const getBinding = useShortcutsStore((s) => s.getBinding);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
   const allWidgetDefs = useMemo(() => getAllWidgets(), []);
 
@@ -94,12 +97,11 @@ export function CommandPalette() {
         return;
       }
 
-      if (action === 'theme:toggle') {
-        document.documentElement.classList.toggle('dark');
-        return;
-      }
+      if (action === 'theme:dark') { setTheme('dark'); return; }
+      if (action === 'theme:light') { setTheme('light'); return; }
+      if (action === 'theme:system') { setTheme('system'); return; }
     },
-    [setActiveDashboard, addWidget, expandWidget, allWidgetDefs],
+    [setActiveDashboard, addWidget, expandWidget, allWidgetDefs, setTheme],
   );
 
   const expandableWidgets = useMemo(() => {
@@ -171,10 +173,17 @@ export function CommandPalette() {
         )}
 
         <CommandGroup heading="Appearance">
-          <CommandItem value="Toggle theme" onSelect={() => handleSelect('theme:toggle')}>
-            <Sun className="h-4 w-4 dark:hidden" />
-            <Moon className="hidden h-4 w-4 dark:block" />
-            <span>Toggle theme</span>
+          <CommandItem value="Theme: Light" onSelect={() => handleSelect('theme:light')}>
+            <Sun className="h-4 w-4" />
+            <span>Light mode</span>
+          </CommandItem>
+          <CommandItem value="Theme: Dark" onSelect={() => handleSelect('theme:dark')}>
+            <Moon className="h-4 w-4" />
+            <span>Dark mode</span>
+          </CommandItem>
+          <CommandItem value="Theme: System" onSelect={() => handleSelect('theme:system')}>
+            <SunMoon className="h-4 w-4" />
+            <span>System theme</span>
           </CommandItem>
         </CommandGroup>
       </CommandList>

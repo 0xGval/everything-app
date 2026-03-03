@@ -1040,7 +1040,7 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 ---
 
-### 4.3 — Theme Customization
+### 4.3 — Theme Customization — COMPLETE (2026-03-03)
 
 **Goal:** Polish the theme toggle and ensure all widgets look correct in both modes.
 
@@ -1048,17 +1048,23 @@ Phase 4 focuses on UX refinements, performance optimization, and additional util
 
 **Steps:**
 
-1. Light and dark mode CSS variables are already defined in `index.css` (configured in Phase 1.1).
-2. Add a theme toggle in the sidebar (or top bar): shadcn `Button` + `DropdownMenu` with "Light", "Dark", "System" options.
-3. Detect system preference via `prefers-color-scheme` media query for the "System" option.
-4. Persist theme choice in `app_settings`.
-5. Ensure all components (shell, widgets, dialogs) look correct in both modes.
+1. Created `theme-store.ts` (zustand) with `light`/`dark`/`system` modes:
+   - `load()` reads persisted theme from `app_settings` table and applies it.
+   - `setTheme(theme)` applies immediately and persists to SQLite.
+   - `applyTheme()` toggles `.dark` class on `<html>` based on mode.
+   - Listens for `prefers-color-scheme` changes — auto-updates when in "system" mode.
+2. Added `ThemeToggle` button in sidebar (above settings gear):
+   - Cycles: Dark (Moon icon) → Light (Sun icon) → System (SunMoon icon).
+   - Tooltip shows current mode: "Theme: Dark" / "Theme: Light" / "Theme: System".
+3. Theme store loaded at startup in `ShellLayout.tsx`.
+4. Updated `CommandPalette.tsx` — "Appearance" group now shows 3 separate options (Light mode, Dark mode, System theme) instead of a single toggle.
+5. All widgets verified correct in both light and dark modes.
 
 **Verification:**
-- [ ] Switching to light mode updates the entire app immediately.
-- [ ] All widgets render correctly in light mode (no invisible text, broken contrast).
-- [ ] "System" mode follows the Windows theme setting.
-- [ ] Theme preference persists across restarts.
+- [x] Switching to light mode updates the entire app immediately.
+- [x] All widgets render correctly in light mode (no invisible text, broken contrast).
+- [x] "System" mode follows the Windows theme setting.
+- [x] Theme preference persists across restarts.
 
 ---
 

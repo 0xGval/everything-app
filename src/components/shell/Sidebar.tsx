@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Settings as SettingsIcon, Trash2, Pencil, House, icons, type LucideIcon } from 'lucide-react';
+import { Moon, Plus, Settings as SettingsIcon, Sun, SunMoon, Trash2, Pencil, House, icons, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
+import { useThemeStore } from '@/lib/store/theme-store';
 import { AppSettingsDialog } from './AppSettingsDialog';
 import { DashboardDialog } from './DashboardDialog';
 
@@ -112,6 +113,7 @@ export function Sidebar() {
         </nav>
 
         <div className="flex flex-col items-center gap-2 pb-1">
+          <ThemeToggle />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -191,5 +193,31 @@ export function Sidebar() {
 
       <AppSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
+  );
+}
+
+function ThemeToggle() {
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+
+  const next = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark';
+  const label = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-sidebar-foreground/60 hover:text-sidebar-foreground"
+          onClick={() => setTheme(next)}
+        >
+          {theme === 'dark' && <Moon className="h-5 w-5" />}
+          {theme === 'light' && <Sun className="h-5 w-5" />}
+          {theme === 'system' && <SunMoon className="h-5 w-5" />}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="right">Theme: {label}</TooltipContent>
+    </Tooltip>
   );
 }

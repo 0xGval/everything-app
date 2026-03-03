@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useLayoutStore } from '@/lib/store/layout-store';
 import { useShortcutsStore } from '@/lib/store/shortcuts-store';
+import { useThemeStore } from '@/lib/store/theme-store';
 
 import { CommandPalette } from './CommandPalette';
 import { GridArea } from './GridArea';
@@ -17,11 +18,13 @@ export function ShellLayout() {
   const dashboards = useDashboardStore((s) => s.dashboards);
   const loadLayout = useLayoutStore((s) => s.loadLayout);
   const loadShortcuts = useShortcutsStore((s) => s.load);
+  const loadTheme = useThemeStore((s) => s.load);
 
   useEffect(() => {
     loadDashboards();
     loadShortcuts();
-  }, [loadDashboards, loadShortcuts]);
+    loadTheme();
+  }, [loadDashboards, loadShortcuts, loadTheme]);
 
   useEffect(() => {
     if (activeId) {
