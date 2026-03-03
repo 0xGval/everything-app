@@ -905,26 +905,29 @@ Phase 3 adds the Voice Recorder widget (Rust audio capture + Groq transcription)
 
 ---
 
-### 3.7 — Web Widget Enhanced View and Toolbar
+### 3.7 — Web Widget Enhanced View and Toolbar — COMPLETE (2026-03-03)
 
 **Goal:** Add a compact toolbar and expanded view for the web widget.
 
 **Steps:**
 
-1. Add a thin toolbar inside `WebWidgetCompact.tsx` above the iframe:
-   - Refresh button (reloads iframe by toggling a key).
-   - "Open in browser" button (opens the URL in the system default browser via `tauri-plugin-opener`).
+1. Added thin toolbar inside `WebWidgetCompact.tsx` above the iframe:
+   - Refresh button (reloads iframe by toggling a `refreshKey` state).
+   - "Open in browser" button (opens URL in system default browser via `tauri-plugin-opener` `openUrl()`).
    - URL display (read-only, truncated, muted text).
-2. Implement `WebWidgetExpanded.tsx`:
-   - Full-page iframe view.
-   - Toolbar with: refresh, open in browser, URL display.
+2. Implemented `WebWidgetExpanded.tsx`:
+   - Full-page iframe view with negative margin to fill parent padding.
+   - Toolbar with: refresh, open in browser, URL display (slightly larger than compact).
+   - Listens for settings changes to update URL dynamically.
 3. Set `hasExpandedView: true` in manifest.
+4. Extracted `normalizeUrl()` into shared `utils.ts` to eliminate duplication between compact/expanded views.
+5. Removed old bottom bar from compact view — replaced by the toolbar at top.
 
 **Verification:**
-- [ ] Refresh button reloads the iframe content.
-- [ ] "Open in browser" opens the URL in the default system browser.
-- [ ] Expanding the web widget shows a full-page iframe view.
-- [ ] URL display shows the current configured URL.
+- [x] Refresh button reloads the iframe content.
+- [x] "Open in browser" opens the URL in the default system browser.
+- [x] Expanding the web widget shows a full-page iframe view.
+- [x] URL display shows the current configured URL.
 
 ---
 

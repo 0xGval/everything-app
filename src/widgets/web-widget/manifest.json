@@ -21,7 +21,7 @@
     "reads": [],
     "writes": []
   },
-  "hasExpandedView": false,
+  "hasExpandedView": true,
   "hasRustModule": false,
   "settings": {
     "url": {
