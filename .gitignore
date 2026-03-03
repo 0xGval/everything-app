@@ -41,6 +41,12 @@ pnpm-debug.log*
 # Tauri generated
 src-tauri/gen/
 
+# Tauri WixTools (downloaded for MSI builds on Windows)
+WixTools/
+
+# Audio recordings (runtime, user data)
+recordings/
+
 # Claude Code
 .claude/
 CLAUDE.md
