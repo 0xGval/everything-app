@@ -1,0 +1,25 @@
+{
+  "id": "crypto-prices",
+  "name": "Crypto Prices",
+  "description": "Live cryptocurrency prices from Hyperliquid with favorites watchlist",
+  "icon": "TrendingUp",
+  "type": "native",
+  "grid": {
+    "minW": 2,
+    "minH": 2,
+    "defaultW": 3,
+    "defaultH": 4
+  },
+  "permissions": ["database"],
+  "events": {
+    "emits": [],
+    "listens": []
+  },
+  "sharedState": {
+    "reads": [],
+    "writes": ["crypto:prices"]
+  },
+  "hasExpandedView": true,
+  "hasRustModule": true,
+  "settings": {}
+}

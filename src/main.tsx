@@ -7,6 +7,7 @@ import '@/widgets/daily-tasks/config';
 import '@/widgets/craving-control/config';
 import '@/widgets/voice-recorder/config';
 import '@/widgets/web-widget/config';
+import '@/widgets/crypto-prices/config';
 
 import "./index.css";
 

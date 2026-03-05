@@ -46,6 +46,8 @@ pub fn run() {
             commands::transcription::get_groq_api_key,
             commands::widget::get_app_setting,
             commands::widget::save_app_setting,
+            commands::crypto::fetch_crypto_meta_and_prices,
+            commands::crypto::fetch_all_mids,
         ])
         .setup(|app| {
             let app_data_dir = app
